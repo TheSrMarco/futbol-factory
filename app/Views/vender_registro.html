@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}Vende con Nosotros{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="card border-0 shadow-lg p-5 rounded-4">
+            <div class="mb-4">
+                <i class="bi bi-shop text-primary" style="font-size: 4rem;"></i>
+            </div>
+            <h1 class="fw-bold">¡Lleva tu negocio al siguiente nivel!</h1>
+            <p class="text-muted">Al convertirte en vendedor de <strong>Mi Tienda MVC</strong>, podrás publicar productos, gestionar inventario y recibir pedidos de miles de clientes.</p>
+            
+            <ul class="list-unstyled text-start my-4 mx-auto" style="max-width: 300px;">
+                <li><i class="bi bi-check2-circle text-success me-2"></i> Publicaciones ilimitadas</li>
+                <li><i class="bi bi-check2-circle text-success me-2"></i> Panel de estadísticas</li>
+                <li><i class="bi bi-check2-circle text-success me-2"></i> Soporte 24/7</li>
+            </ul>
+
+            <form action="{{ url_for('main.convertir_vendedor') }}" method="POST">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill w-100 shadow">
+                    ¡Sí, quiero ser vendedor!
+                </button>
+                <a href="{{ url_for('main.perfil') }}" class="btn btn-link text-muted mt-3">Tal vez más tarde</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

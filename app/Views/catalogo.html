@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block title %}Sport-Tech | Catálogo Elite{% endblock %}
+
+{% block content %}
+<style>
+    /* Estética Deportiva Global */
+    .sport-sidebar {
+        border-radius: 0;
+        border-left: 5px solid #007bff;
+        background: #fdfdfd;
+    }
+    .nav-sport-link {
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 1px;
+        transition: 0.2s;
+        border-bottom: 1px solid #eee;
+        color: #666;
+    }
+    .nav-sport-link:hover {
+        padding-left: 10px;
+        color: #007bff !important;
+    }
+    .active-sport {
+        background: #007bff !important;
+        color: white !important;
+    }
+    .card-sport {
+        border-radius: 0; /* Bordes rectos para un look más técnico */
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .card-sport:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+        border-color: #007bff;
+    }
+    .img-container {
+        overflow: hidden;
+        position: relative;
+    }
+    .card-sport img {
+        transition: transform 0.5s ease;
+    }
+    .card-sport:hover img {
+        transform: scale(1.1);
+    }
+    .btn-action-sport {
+        border-radius: 0;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-style: italic;
+        letter-spacing: 1px;
+    }
+    .price-tag {
+        font-size: 1.3rem;
+        font-weight: 900;
+        color: #121212;
+    }
+</style>
+
+<div class="row mt-5">
+    <aside class="col-lg-3 d-none d-lg-block mb-4">
+        <div class="card border-0 shadow-sm p-4 sport-sidebar">
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('main.catalogo') }}"
+                   class="list-group-item list-group-item-action nav-sport-link border-0 {% if not request.args.get('cat') %}active-sport{% endif %}">
+                    <i class="bi bi-grid-fill me-2"></i>Todo el Equipo
+                </a>
+                {% for cat in categorias %}
+                <a href="{{ url_for('main.catalogo', cat=cat.id) }}"
+                   class="list-group-item list-group-item-action nav-sport-link border-0 {% if request.args.get('cat')|int == cat.id %}active-sport{% endif %}">
+                    {{ cat.nombre }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
+
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-end mb-4 px-2">
+            <div>
+                <h6 class="text-primary fw-bold text-uppercase mb-0">Colección 2026</h6>
+                <h2 class="fw-black text-uppercase m-0" style="font-weight: 900;">Performance <span class="text-primary">Gear</span></h2>
+            </div>
+            <span class="badge bg-dark rounded-0 px-3 py-2">{{ productos|length }} ARTÍCULOS</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            {% for prod in productos %}
+            <div class="col">
+                <div class="card h-100 card-sport shadow-sm">
+                    <div class="img-container">
+                        <img src="{{ prod.imagen_url if prod.imagen_url else 'https://placehold.co/600x600/111/fff?text=EQUIPMENT' }}"
+                             class="card-img-top" alt="{{ prod.nombre }}"
+                             style="height: 280px; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-white text-dark rounded-0 text-uppercase fw-bold shadow-sm" style="font-size: 0.7rem;">
+                                {{ prod.categoria.nombre if prod.categoria else 'Pro' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body d-flex flex-column p-4">
+                        <h5 class="fw-black text-uppercase mb-3" style="font-weight: 800; line-height: 1.2;">{{ prod.nombre }}</h5>
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                            <span class="price-tag">${{ "{:,.2f}".format(prod.precio) }}</span>
+
+                            <form action="{{ url_for('main.agregar_al_carrito', id_producto=prod.id_producto) }}" method="POST">
+                                <button type="submit" class="btn btn-dark btn-action-sport px-3 py-2 shadow">
+                                    <i class="bi bi-lightning-fill text-warning me-1"></i> Añadir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-exclamation-octagon display-1 text-muted opacity-25"></i>
+                <h3 class="text-muted mt-3 fw-bold text-uppercase">Sin Stock en esta Categoría</h3>
+                <a href="{{ url_for('main.catalogo') }}" class="btn btn-primary rounded-0 mt-3 text-uppercase fw-bold">Ver todo el inventario</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

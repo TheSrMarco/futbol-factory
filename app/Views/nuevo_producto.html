@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}Sport-Tech | Nuevo Equipo{% endblock %}
+
+{% block content %}
+<style>
+    .sport-card { border-radius: 0; border-left: 8px solid #007bff; }
+    .sport-input { border-radius: 0; border: 2px solid #eee; padding: 12px; transition: 0.3s; }
+    .sport-input:focus { border-color: #007bff; box-shadow: none; background: #f8f9fa; }
+    .sport-label { text-transform: uppercase; font-weight: 800; letter-spacing: 1px; font-size: 0.85rem; color: #444; }
+    .btn-publish { border-radius: 0; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-style: italic; }
+</style>
+
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-lg sport-card">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <h2 class="fw-black text-uppercase m-0" style="font-weight: 900;">Registrar <span class="text-primary">Gear</span></h2>
+                    <p class="text-muted small">Añade nuevo equipamiento de alto rendimiento al catálogo.</p>
+                </div>
+
+                <form action="{{ url_for('main.crear_producto') }}" method="POST">
+                    <div class="mb-4">
+                        <label class="form-label sport-label">Nombre del Producto</label>
+                        <input type="text" name="nombre" class="form-control sport-input" placeholder="Ej: TENIS RUNNING PRO X1" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label sport-label">Disciplina / Categoría</label>
+                        <select name="id_categoria" class="form-select sport-input" required>
+                            <option value="" selected disabled>Selecciona categoría...</option>
+                            {% for cat in categorias %}
+                            <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label sport-label">Especificaciones Técnicas</label>
+                        <textarea name="descripcion" class="form-control sport-input" placeholder="Detalles de materiales, tecnología, etc..." rows="3" required></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label sport-label">Precio ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-white border-0 rounded-0">$</span>
+                                <input type="number" step="0.01" name="precio" class="form-control sport-input" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label sport-label">Stock de Unidades</label>
+                            <input type="number" name="stock" class="form-control sport-input" value="1" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label sport-label">URL de Imagen (High Res)</label>
+                        <input type="url" name="imagen_url" class="form-control sport-input" placeholder="https://tu-servidor.com/foto-deporte.jpg">
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg btn-publish shadow">
+                            <i class="bi bi-cloud-upload-fill me-2"></i>Lanzar Producto
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-dark btn-publish border-2">
+                            Volver al Panel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

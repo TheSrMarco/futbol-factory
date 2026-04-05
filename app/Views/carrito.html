@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block title %}Mi Carrito{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4">🛒 Tu Carrito</h2>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                {% if items %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>PRODUCTO</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-end">SUBTOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ item.producto.imagen_url }}" class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">{{ item.producto.nombre }}</h6>
+                                            <small class="text-muted">${{ "{:,.2f}".format(item.producto.precio) }} c/u</small>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <form action="{{ url_for('main.restar_cantidad', id_producto=item.id_producto) }}" method="POST" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;">
+                                                <span style="margin-top: -2px;">−</span>
+                                            </button>
+                                        </form>
+
+                                        <span class="mx-3 fw-bold fs-5 text-dark" style="min-width: 25px;">{{ item.cantidad }}</span>
+
+                                        <form action="{{ url_for('main.sumar_cantidad', id_producto=item.id_producto) }}" method="POST" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;">
+                                                <span style="margin-top: -2px;">+</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+
+                                <td class="text-end fw-bold text-primary">
+                                    ${{ "{:,.2f}".format(item.producto.precio * item.cantidad) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 text-start border-top pt-3">
+                    <form action="{{ url_for('main.vaciar_carrito') }}" method="POST" onsubmit="return confirm('¿Seguro que quieres vaciar todo el carrito?');">
+                        <button type="submit" class="btn btn-link text-danger text-decoration-none btn-sm">
+                            🗑️ Vaciar Carrito por completo
+                        </button>
+                    </form>
+                </div>
+
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="display-1 text-muted mb-3">🛒</div>
+                    <h5>Tu carrito está vacío</h5>
+                    <p class="text-muted small">¡Explora nuestro catálogo y encuentra algo increíble!</p>
+                    <a href="{{ url_for('main.catalogo') }}" class="btn btn-primary rounded-pill mt-3 px-4">Ir a comprar</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                <h5 class="fw-bold mb-4">Resumen de compra</h5>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-bold">${{ "{:,.2f}".format(total) }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Envío</span>
+                    <span class="text-success fw-bold">Gratis</span>
+                </div>
+                <hr class="my-3">
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="h5 fw-bold">Total</span>
+                    <span class="h5 fw-bold text-primary">${{ "{:,.2f}".format(total) }}</span>
+                </div>
+                <form action="{{ url_for('main.finalizar_compra') }}" method="POST">
+                    <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow">
+                        FINALIZAR COMPRA
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

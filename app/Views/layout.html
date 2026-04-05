@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FUTBOL FACTORY | {% block title %}{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sport-blue: #007bff;
+            --sport-dark: #0a0a0a;
+            --sport-accent: #e6e6e6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: var(--sport-dark);
+        }
+
+        /* Tipografía de Títulos */
+        h1, h2, h3, .navbar-brand, .btn-sport {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Navbar Deportiva */
+        .navbar {
+            background-color: var(--sport-dark) !important;
+            padding: 1rem 0;
+            border-bottom: 3px solid var(--sport-blue);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+
+        .nav-link {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin: 0 10px;
+            color: rgba(255,255,255,0.8) !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--sport-blue) !important;
+            transform: skewX(-10deg); /* Efecto dinámico de velocidad */
+        }
+
+        /* Botones Estilo Elite */
+        .btn-login {
+            background-color: var(--sport-blue);
+            color: white;
+            border-radius: 0; /* Bordes rectos = Más agresivo */
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            transition: 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); /* Botón en paralelogramo */
+        }
+
+        .btn-login:hover {
+            background-color: #0056b3;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Footer Moderno */
+        footer {
+            background-color: var(--sport-dark);
+            color: white;
+            border-top: 5px solid var(--sport-blue);
+        }
+
+        /* Toast / Notificaciones Deportivas */
+        .toast {
+            border-radius: 0;
+            border-left: 5px solid white;
+        }
+
+        .bg-success { background-color: #28a745 !important; }
+        .bg-danger { background-color: #dc3545 !important; }
+
+        /* Contenedor Principal */
+        main {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-lg">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.hello_world') }}">
+                <i class="bi bi-lightning-charge-fill text-primary me-1"></i>FUTBOL <span class="text-primary">FACTORY</span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list text-white fs-2"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.hello_world' %}active{% endif %}"
+                           href="{{ url_for('main.hello_world') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.catalogo' %}active{% endif %}"
+                           href="{{ url_for('main.catalogo') }}">Catálogo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative {% if request.endpoint == 'main.ver_carrito' %}active{% endif %}"
+                           href="{{ url_for('main.ver_carrito') }}">
+                            <i class="bi bi-cart3"></i>
+                        </a>
+                    </li>
+
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle btn btn-outline-primary border-2 rounded-0 px-3"
+                               href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-fill"></i> {{ current_user.nombre | upper }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-0 mt-2" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item fw-bold" href="{{ url_for('main.perfil') }}">MI PERFIL</a></li>
+                                <li><a class="dropdown-item fw-bold" href="{{ url_for('main.mis_compras') }}">MIS COMPRAS</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger fw-bold" href="{{ url_for('auth.logout') }}">CERRAR SESIÓN</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-lg-4">
+                            <a class="btn btn-login" href="{{ url_for('auth.auth_page') }}">
+                                LOGIN <i class="bi bi-arrow-right-short"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5" style="min-height: 75vh;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-5 mt-auto">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <h4 class="fw-bold m-0">FF <span class="text-primary">FACTORY</span></h4>
+                    <p class="small opacity-50 m-0">Equipamiento para atletas de alto rendimiento.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <p class="mb-0 small">&copy; 2026. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set bg_class = 'bg-success' if category == 'success' else 'bg-danger' if category == 'danger' or category == 'error' else 'bg-dark' %}
+                    <div class="toast show align-items-center text-white {{ bg_class }} border-0 shadow-lg" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body fw-bold">
+                                {{ message | upper }}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

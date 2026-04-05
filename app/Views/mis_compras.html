@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}Mis Compras{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4">📦 Mis Pedidos</h2>
+
+    {% if compras %}
+        {% for compra in compras %}
+        <div class="card shadow-sm mb-4 border-0 rounded-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <span class="text-muted small">PEDIDO REALIZADO EL</span>
+                    <p class="mb-0 fw-bold">{{ compra.fecha.strftime('%d de %b, %Y') }}</p>
+                </div>
+                <div>
+                    <span class="text-muted small">TOTAL</span>
+                    <p class="mb-0 fw-bold text-primary">${{ compra.total_pago }}</p>
+                </div>
+                <div>
+                    <span class="badge {% if compra.estado_envio == 'entregado' %}bg-success{% else %}bg-info{% endif %} rounded-pill">
+                        {{ compra.estado_envio | upper }}
+                    </span>
+                </div>
+                <div class="text-muted small">
+                    ORDEN #{{ compra.id }}
+                </div>
+            </div>
+            <div class="card-body">
+                {% for detalle in compra.detalles %}
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ detalle.producto.imagen_url }}" class="rounded" style="width: 70px; height: 70px; object-fit: cover;" alt="Producto">
+                    <div class="ms-3">
+                        <h6 class="mb-0 fw-bold">{{ detalle.producto.nombre }}</h6>
+                        <p class="text-muted small mb-0">Cantidad: {{ detalle.cantidad }} | Precio Unit: ${{ detalle.precio_unitario }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer bg-light border-0 text-end">
+                <button class="btn btn-sm btn-outline-dark">Ver Factura</button>
+                <button class="btn btn-sm btn-primary">Volver a comprar</button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <div class="mb-3">🛒</div>
+            <h4>Aún no has realizado compras.</h4>
+            <p class="text-muted">¡Tu armario te está esperando!</p>
+            <a href="{{ url_for('main.catalogo') }}" class="btn btn-primary rounded-pill px-4">Ir al Catálogo</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

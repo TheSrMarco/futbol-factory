@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block title %}Panel de Vendedor | Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --accent-color: #4361ee;
+    }
+    body { background-color: #f8f9fc; }
+    .card-stat {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none !important;
+    }
+    .card-stat:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+    }
+    .icon-shape {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .table-modern thead th {
+        background-color: #f8f9fc;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #6c757d;
+        border-top: none;
+    }
+    .badge-pill-custom {
+        padding: 0.5em 1em;
+        font-weight: 500;
+    }
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: none;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row align-items-center mb-5">
+        <div class="col">
+            <h2 class="fw-extrabold text-dark mb-1">Panel de Control</h2>
+            <p class="text-muted mb-0">
+                <span class="badge bg-primary-subtle text-primary rounded-pill me-2">Vendedor</span>
+                Bienvenido de nuevo, <span class="fw-bold text-dark">{{ current_user.nombre }}</span>
+            </p>
+        </div>
+        <div class="col-auto">
+            <a href="{{ url_for('main.crear_producto') }}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm d-flex align-items-center">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                <span>Nuevo Producto</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card card-stat shadow-sm rounded-4 p-3 bg-white">
+                <div class="d-flex align-items-center">
+                    <div class="icon-shape bg-primary-subtle rounded-4 text-primary">
+                        <i class="bi bi-box-seam fs-3"></i>
+                    </div>
+                    <div class="ms-4">
+                        <p class="text-muted small fw-bold mb-0">PRODUCTOS</p>
+                        <h3 class="fw-bold mb-0">{{ productos|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0 text-dark">Inventario de Productos</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-modern table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ producto.imagen_url or 'https://via.placeholder.com/60' }}" class="rounded-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                <div class="ms-3">
+                                    <h6 class="fw-bold mb-0">{{ producto.nombre }}</h6>
+                                    <small class="text-muted">ID: #{{ producto.id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="text-muted small fw-semibold">{{ producto.categoria.nombre if producto.categoria else 'General' }}</span></td>
+                        <td class="fw-bold text-dark">${{ "{:,.2f}".format(producto.precio) }}</td>
+                        <td>
+                            {% if producto.stock > 2 %}
+                                <span class="text-dark">{{ producto.stock }}</span>
+                            {% else %}
+                                <span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ producto.stock }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-success-subtle text-success rounded-pill badge-pill-custom">Activo</span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('main.editar_producto', id=producto.id_producto) }}" class="btn btn-light btn-action rounded-circle shadow-sm" title="Editar">
+                                    <i class="bi bi-pencil-square text-primary"></i>
+                                </a>
+                                <form action="{{ url_for('main.eliminar_producto', id=producto.id_producto) }}" method="POST" onsubmit="return confirm('¿Eliminar producto definitivamente?');">
+                                    <button type="submit" class="btn btn-light btn-action rounded-circle shadow-sm" title="Eliminar">
+                                        <i class="bi bi-trash3 text-danger"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

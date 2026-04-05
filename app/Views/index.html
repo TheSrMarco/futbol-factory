@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block title %}Sport-Tech | Rendimiento sin Límites{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos específicos para el look deportivo */
+    :root {
+        --sport-blue: #007bff;
+        --sport-dark: #121212;
+    }
+    .hover-zoom {
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border-radius: 15px !important;
+    }
+    .hover-zoom:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+    .sport-gradient {
+        background: linear-gradient(45deg, var(--sport-dark), #2c3e50);
+    }
+    .badge-performance {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255,255,255,0.2);
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    .btn-sport {
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+    }
+    .price-tag {
+        font-size: 1.4rem;
+        color: var(--sport-dark);
+    }
+</style>
+
+<div id="heroStore" class="carousel slide mb-5 shadow-lg rounded-4 overflow-hidden" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active" style="min-height: 450px; background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center;">
+            <div class="carousel-caption d-flex flex-column h-100 align-items-start justify-content-center text-start px-5">
+                <span class="badge bg-primary mb-3 px-3 py-2 rounded-0 text-uppercase">Nueva Temporada</span>
+                <h1 class="display-3 fw-black text-uppercase italic" style="font-style: italic; font-weight: 900;">SUPERÁ TU LÍMITE</h1>
+                <p class="lead mb-4 w-75 d-none d-md-block">
+                  Para quienes <strong>no conocen los límites</strong>.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('main.catalogo') }}" class="btn btn-primary btn-lg rounded-0 px-5 py-3 btn-sport shadow">Explorar Pro</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="productos" class="d-flex align-items-end justify-content-between mb-4 mt-5">
+        <div>
+            <h2 class="fw-black text-dark text-uppercase m-0" style="font-weight: 900;">Tendencias Elite</h2>
+        </div>
+        <a href="{{ url_for('main.catalogo') }}" class="text-decoration-none fw-bold text-dark small text-uppercase">Ver todo <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        {% for prod in productos %}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm hover-zoom overflow-hidden">
+                <div class="position-relative">
+                    {% if loop.first %}
+                        <span class="badge badge-performance position-absolute m-3 px-3 py-2 rounded-1 text-white shadow-sm border-start border-primary border-4">NUEVO DROP</span>
+                    {% else %}
+                        <span class="badge badge-performance position-absolute m-3 px-3 py-2 rounded-1 text-white shadow-sm border-start border-warning border-4">HOT ITEM</span>
+                    {% endif %}
+
+                    <img src="{{ prod.imagen_url if prod.imagen_url else 'https://dummyimage.com/600x600/dee2e6/6c757d.jpg&text=Equipamiento' }}"
+                         class="card-img-top"
+                         alt="{{ prod.nombre }}"
+                         style="height: 350px; object-fit: cover;">
+                </div>
+
+                <div class="card-body p-4 bg-white">
+                    <p class="text-primary small fw-bold text-uppercase mb-1">{{ prod.categoria.nombre if prod.categoria else 'Performance' }}</p>
+                    <h4 class="card-title fw-extrabold text-dark text-uppercase mb-3" style="font-weight: 800;">{{ prod.nombre }}</h4>
+
+                    <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                        <span class="price-tag fw-black">${{ "{:,.2f}".format(prod.precio) }}</span>
+                        <a href="{{ url_for('main.catalogo') }}" class="btn btn-dark btn-sport rounded-0 px-4 py-2 text-decoration-none">
+                            EQUÍPATE YA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-trophy display-1 text-muted opacity-25"></i>
+                <h4 class="text-muted mt-3">Próximamente nuevo equipamiento.</h4>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends "layout.html" %}
+
+{% block title %}Acceso Elite | FF FACTORY{% endblock %}
+
+{% block content %}
+<style>
+    /* Tarjeta estilo "Factory" - Sin curvas y con acento superior */
+    .auth-card {
+        border-radius: 0;
+        border: none;
+        border-top: 6px solid var(--sport-blue);
+        background: #fff;
+    }
+
+    /* Tabs Brutalistas */
+    .nav-pills .nav-link {
+        font-family: 'Oswald', sans-serif;
+        text-transform: uppercase;
+        color: var(--sport-dark);
+        border-radius: 0;
+        border: 1px solid #ddd;
+        margin: 0 2px;
+        letter-spacing: 1px;
+        transition: 0.3s ease;
+                color: var(--sport-blue) !important;
+
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: var(--sport-dark) !important;
+        color: var(--sport-blue) !important;
+        border-color: var(--sport-dark);
+        transform: skewX(-5deg); /* Inclinación visual del tab */
+    }
+
+    /* Inputs Estilo Técnico */
+    .form-control {
+        border-radius: 0;
+        border: 2px solid #eee;
+        padding: 0.8rem 1rem;
+        font-weight: 500;
+    }
+
+    .form-control:focus {
+        border-color: var(--sport-blue);
+        box-shadow: none;
+        background-color: #fafafa;
+    }
+
+    .form-label-sport {
+        font-family: 'Oswald', sans-serif;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        color: #666;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    /* Botón con el clip-path del Layout */
+    .btn-auth-sport {
+        font-family: 'Oswald', sans-serif;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        border-radius: 0;
+        border: none;
+        padding: 0.8rem;
+        transition: 0.3s;
+        /* El corte diagonal se mantiene */
+        clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+        display: block;
+    }
+
+    .btn-login-action {
+        background-color: var(--sport-blue);
+        color: white;
+    }
+
+    .btn-register-action {
+        background-color: var(--sport-dark);
+        color: white;
+    }
+
+    /* FIX: HOVER SIN AFECTAR LAS LETRAS */
+    .btn-auth-sport:hover {
+        /* Eliminamos transform: scale y skew para que el texto no se mueva */
+        transform: none;
+        filter: brightness(1.1); /* Solo un cambio de luz sutil */
+        box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1); /* Efecto de brillo interno */
+    }
+
+    /* Links Urbanos */
+    .link-sport {
+        font-family: 'Oswald', sans-serif;
+        color: var(--sport-dark);
+        text-decoration: none;
+        font-size: 0.8rem;
+        border-bottom: 2px solid var(--sport-blue);
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center py-5" style="min-height: 80vh;">
+
+    <div class="card auth-card shadow-lg" style="max-width: 480px; width: 100%;">
+
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+            <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="tab-login" data-bs-toggle="pill" data-bs-target="#pane-login" type="button">
+                        IDENTIFICARSE
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-registro" data-bs-toggle="pill" data-bs-target="#pane-registro" type="button">
+                        NUEVO REGISTRO
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body p-4 pt-0">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-dark border-0 border-start border-4 border-primary rounded-0 small" role="alert">
+                            <strong>SISTEMA:</strong> {{ message | upper }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="tab-content" id="pills-tabContent">
+
+                <div class="tab-pane fade show active" id="pane-login" role="tabpanel">
+                    <div class="text-center mb-4">
+                        <p class="text-muted small">ACCEDER </p>
+                    </div>
+
+                    <form action="{{ url_for('auth.login') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label-sport">Correo Electrónico</label>
+                            <input type="email" class="form-control" name="email" placeholder="USER@FFFACTORY.COM" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label-sport">Clave de Acceso</label>
+                            <input type="password" class="form-control" name="password" placeholder="••••••••" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-auth-sport btn-login-action w-100 mb-4">
+                            ENTRAR AL SISTEMA <i class="bi bi-lightning-fill"></i>
+                        </button>
+
+                        <div class="text-center">
+                            <a href="#" class="link-sport">¿OLVIDASTE TU CONTRASEÑA?</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" id="pane-registro" role="tabpanel">
+                    <div class="text-center mb-4">
+                        <p class="text-muted small">FORMA PARTE DE LA ÉLITE DE FUTBOL FACTORY</p>
+                    </div>
+
+                    <form action="{{ url_for('auth.registro') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label-sport">Nombre del Atleta</label>
+                            <input type="text" class="form-control" name="nombre" placeholder="TU NOMBRE" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label-sport">Correo Electrónico</label>
+                            <input type="email" class="form-control" name="email" placeholder="EMAIL@EXAMPLE.COM" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label-sport">Contraseña</label>
+                            <input type="password" class="form-control" name="password" placeholder="MÍNIMO 8 CARACTERES" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input border-dark" type="checkbox" id="terms" required>
+                                <label class="form-check-label small text-muted fw-bold" for="terms">
+                                    ACEPTO LOS TÉRMINOS DE RENDIMIENTO
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-auth-sport btn-register-action w-100">
+                            REGISTRAR CUENTA <i class="bi bi-shield-check"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

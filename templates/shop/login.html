@@ -1,0 +1,56 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Acceso{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item w-50" role="presentation">
+                        <button class="nav-link active w-100 fw-bold" data-bs-toggle="tab" data-bs-target="#login" type="button">Iniciar sesion</button>
+                    </li>
+                    <li class="nav-item w-50" role="presentation">
+                        <button class="nav-link w-100 fw-bold" data-bs-toggle="tab" data-bs-target="#registro" type="button">Registro</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="login">
+                        <form method="post" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" name="email" class="form-control" required autocomplete="email">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Contrasena</label>
+                                <input type="password" name="password" class="form-control" required autocomplete="current-password">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="registro">
+                        <form method="post" action="{% url 'registro' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nombre completo</label>
+                                <input type="text" name="nombre" class="form-control" required autocomplete="name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" name="email" class="form-control" required autocomplete="email">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Contrasena</label>
+                                <input type="password" name="password" class="form-control" minlength="8" required autocomplete="new-password">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Crear cuenta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

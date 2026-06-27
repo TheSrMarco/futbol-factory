@@ -1,0 +1,23 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Mis compras{% endblock %}
+
+{% block content %}
+<h2 class="fw-black text-uppercase mb-4">Mis compras</h2>
+{% for compra in compras %}
+    <div class="card border-0 shadow-sm p-4 mb-3">
+        <div class="d-flex justify-content-between">
+            <strong>Compra #{{ compra.id_venta }}</strong>
+            <span>${{ compra.total_pago|floatformat:2 }}</span>
+        </div>
+        <p class="text-muted mb-2">{{ compra.fecha }} · {{ compra.estado_envio }}</p>
+        <ul class="mb-0">
+            {% for detalle in compra.detalles.all %}
+                <li>{{ detalle.producto.nombre }} x{{ detalle.cantidad }} · ${{ detalle.precio_unitario|floatformat:2 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% empty %}
+    <p class="text-muted">Aun no tienes compras registradas.</p>
+{% endfor %}
+{% endblock %}

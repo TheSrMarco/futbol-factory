@@ -1,0 +1,16 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm p-4">
+    <h2 class="fw-black text-uppercase">{{ current_usuario.nombre }}</h2>
+    <p class="mb-1"><strong>Email:</strong> {{ current_usuario.email }}</p>
+    <p class="mb-4"><strong>Rol:</strong> {{ current_usuario.rol }}</p>
+    {% if current_usuario.rol == 'vendedor' %}
+        <a href="{% url 'dashboard' %}" class="btn btn-primary">Ir al dashboard</a>
+    {% else %}
+        <a href="{% url 'quiero_vender' %}" class="btn btn-primary">Quiero vender</a>
+    {% endif %}
+</div>
+{% endblock %}

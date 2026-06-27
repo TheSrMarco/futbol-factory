@@ -1,0 +1,14 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Quiero vender{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm p-5 text-center">
+    <h2 class="fw-black text-uppercase">Convertir cuenta a vendedor</h2>
+    <p class="text-muted">Podras publicar productos y administrar tu inventario.</p>
+    <form method="post" action="{% url 'convertir_vendedor' %}">
+        {% csrf_token %}
+        <button class="btn btn-primary btn-lg">Activar modo vendedor</button>
+    </form>
+</div>
+{% endblock %}

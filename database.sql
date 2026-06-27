@@ -548,6 +548,9 @@ COPY public.usuarios (id_usuario, email, password, rol, nombre) FROM stdin;
 11	juan.atleta@ffactory.com	pbkdf2:sha256:1000000$ZvBQOXQMbxASNM3u$35dfcbbb0ddbec61fc467415d15fe0f3b8fd35ae8d893e6394bb072ea1eab8a0	cliente	Juan Perez
 12	ricardocom@dasdas.com	pbkdf2:sha256:1000000$ngQFm6yGolHxjGRO$6db6b82b6e71612b3b72fef39715ec4b9d59f2416872ea248ea20623f1bf00e3	cliente	marco
 13	ricardo2@gmail.com	pbkdf2:sha256:1000000$k4sv9KDU4vZpMT8s$ffb0126510a673e5c2edc0d048a450d8eb953007f9b5b96bfec442774b371ba2	vendedor	ricardo2
+14	yoshi@gmail.com	pbkdf2:sha256:1000000$2RQAwVAee0egdAVP$00d171ea83e6e10c889c28cbcab2c508a4d1080b85bb6dbbfd53ddd1a1cf18e3	admin	Yoshiro
+15	cliente@ffactory.com	pbkdf2:sha256:1000000$hMfgzs82Qh2QQf10$a315041befbc9c47aec8e34d2d547640cbffd1c05afe0c112ba20303c34c3ce7	cliente	Cliente Demo
+16	vendedor@ffactory.com	pbkdf2:sha256:1000000$m4FfAb4SuUSkWs8t$228f128bb27940adb1f45eb6dafae370988e7d3a0dbc0157cce0756494bc20a2	vendedor	Vendedor Demo
 \.
 
 
@@ -643,7 +646,7 @@ SELECT pg_catalog.setval('public.sesiones_id_sesion_seq', 1, false);
 -- Name: usuarios_id_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.usuarios_id_usuario_seq', 13, true);
+SELECT pg_catalog.setval('public.usuarios_id_usuario_seq', 16, true);
 
 
 --

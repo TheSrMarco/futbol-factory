@@ -48,3 +48,17 @@ def vendedor_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return wrapped
+
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def wrapped(request, *args, **kwargs):
+        usuario = get_current_usuario(request)
+        if not usuario:
+            return redirect(f'/login/?next={request.path}')
+        if usuario.rol != 'admin':
+            messages.error(request, 'Acceso reservado para administradores.')
+            return redirect('perfil')
+        return view_func(request, *args, **kwargs)
+
+    return wrapped

@@ -9,7 +9,10 @@ from django.utils import timezone
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .models import Carrito, Categoria, DetalleVenta, Producto, Usuario, Venta
-from .services import SESSION_USER_KEY, get_current_usuario, login_required_view, vendedor_required
+from .services import SESSION_USER_KEY, admin_required, get_current_usuario, login_required_view, vendedor_required
+
+
+ROLES = {'admin', 'cliente', 'vendedor'}
 
 
 def _safe_next_url(request):
@@ -244,6 +247,9 @@ def finalizar_compra(request):
 @login_required_view
 def quiero_vender(request):
     usuario = get_current_usuario(request)
+    if usuario.rol == 'admin':
+        messages.info(request, 'Tu cuenta ya tiene permisos de administrador.')
+        return redirect('admin_dashboard')
     if usuario.rol == 'vendedor':
         messages.info(request, 'Ya eres vendedor.')
         return redirect('perfil')
@@ -341,3 +347,67 @@ def eliminar_producto(request, id_producto):
         producto.save(update_fields=['activo'])
         messages.warning(request, 'Producto eliminado del inventario.')
     return redirect('dashboard')
+
+
+@admin_required
+def admin_dashboard(request):
+    usuarios = Usuario.objects.all().order_by('id_usuario')
+    productos = Producto.objects.select_related('categoria', 'vendedor').order_by('-id_producto')
+    ventas = Venta.objects.select_related('usuario').prefetch_related('detalles__producto').order_by('-fecha')
+    total_ventas = ventas.aggregate(total=Sum('total_pago'))['total'] or Decimal('0.00')
+
+    stats = {
+        'usuarios': usuarios.count(),
+        'clientes': usuarios.filter(rol='cliente').count(),
+        'vendedores': usuarios.filter(rol='vendedor').count(),
+        'admins': usuarios.filter(rol='admin').count(),
+        'productos_activos': productos.filter(activo=True).count(),
+        'ventas': ventas.count(),
+        'total_ventas': total_ventas,
+    }
+
+    return render(
+        request,
+        'shop/admin_dashboard.html',
+        {
+            'usuarios': usuarios,
+            'productos': productos[:20],
+            'ventas': ventas[:10],
+            'stats': stats,
+            'roles': sorted(ROLES),
+        },
+    )
+
+
+@admin_required
+def admin_cambiar_rol(request, id_usuario):
+    if request.method != 'POST':
+        return redirect('admin_dashboard')
+
+    usuario = get_object_or_404(Usuario, pk=id_usuario)
+    nuevo_rol = request.POST.get('rol')
+    if nuevo_rol not in ROLES:
+        messages.error(request, 'Rol invalido.')
+        return redirect('admin_dashboard')
+
+    if usuario.id_usuario == get_current_usuario(request).id_usuario and nuevo_rol != 'admin':
+        messages.warning(request, 'No puedes quitarte el rol admin desde tu propia sesion.')
+        return redirect('admin_dashboard')
+
+    usuario.rol = nuevo_rol
+    usuario.save(update_fields=['rol'])
+    messages.success(request, f'Rol actualizado para {usuario.email}.')
+    return redirect('admin_dashboard')
+
+
+@admin_required
+def admin_toggle_producto(request, id_producto):
+    if request.method != 'POST':
+        return redirect('admin_dashboard')
+
+    producto = get_object_or_404(Producto, pk=id_producto)
+    producto.activo = not producto.activo
+    producto.save(update_fields=['activo'])
+    estado = 'activado' if producto.activo else 'desactivado'
+    messages.info(request, f'Producto {estado}: {producto.nombre}.')
+    return redirect('admin_dashboard')

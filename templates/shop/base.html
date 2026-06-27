@@ -24,15 +24,24 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Catalogo</a></li>
                     {% if current_usuario %}
+                        {% if current_usuario.rol == 'admin' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Admin</a></li>
+                        {% elif current_usuario.rol == 'vendedor' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+                        {% endif %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}"><i class="bi bi-cart3"></i></a></li>
                         <li class="nav-item dropdown ms-lg-3">
                             <a class="nav-link dropdown-toggle btn btn-outline-primary border-2 rounded-0 px-3" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-fill"></i> {{ current_usuario.nombre|upper }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-0 mt-2">
+                                <li><span class="dropdown-item-text small text-muted text-uppercase">Rol: {{ current_usuario.rol }}</span></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item fw-bold" href="{% url 'perfil' %}">Mi perfil</a></li>
                                 <li><a class="dropdown-item fw-bold" href="{% url 'mis_compras' %}">Mis compras</a></li>
-                                {% if current_usuario.rol == 'vendedor' %}
+                                {% if current_usuario.rol == 'admin' %}
+                                    <li><a class="dropdown-item fw-bold" href="{% url 'admin_dashboard' %}">Panel admin</a></li>
+                                {% elif current_usuario.rol == 'vendedor' %}
                                     <li><a class="dropdown-item fw-bold" href="{% url 'dashboard' %}">Dashboard</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>

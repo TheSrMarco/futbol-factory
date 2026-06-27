@@ -29,7 +29,8 @@ La version actual conserva:
 - PostgreSQL como base de datos.
 - Bootstrap para la interfaz visual.
 - Templates renderizados desde servidor.
-- Catalogo, login/registro, carrito, compras, perfil y dashboard de vendedor.
+- Catalogo, login/registro, carrito, compras, perfil, dashboard de vendedor y
+  panel administrador.
 - CSRF en formularios mediante middleware de Django.
 
 Quedan como pendientes productivos los controles avanzados documentados para una
@@ -130,6 +131,23 @@ apagado o las credenciales de `.env` no coinciden.
 - `/mis-compras/` historial de compras
 - `/perfil/` perfil de usuario
 - `/dashboard/` panel de vendedor
+- `/admin-panel/` panel administrador
+
+## Roles y credenciales de prueba
+
+El prototipo maneja tres roles principales:
+
+- `cliente`: compra productos, administra carrito y consulta historial.
+- `vendedor`: mantiene las funciones de cliente y administra su inventario.
+- `admin`: revisa usuarios, cambia roles, consulta productos y revisa ventas.
+
+Usuarios demo:
+
+```text
+Admin:    yoshi@gmail.com      / root
+Cliente:  cliente@ffactory.com / root
+Vendedor: vendedor@ffactory.com / root
+```
 
 ## Variables de entorno
 

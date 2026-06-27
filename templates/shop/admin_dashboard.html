@@ -1,0 +1,158 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Panel admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-black text-uppercase mb-0">Panel administrador</h2>
+        <p class="text-muted mb-0">Control de usuarios, productos y ventas.</p>
+    </div>
+    <span class="badge bg-dark px-3 py-2 text-uppercase">Rol admin</span>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Usuarios</span>
+            <strong class="display-6">{{ stats.usuarios }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Clientes</span>
+            <strong class="display-6">{{ stats.clientes }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Vendedores</span>
+            <strong class="display-6">{{ stats.vendedores }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Ventas</span>
+            <strong class="display-6">{{ stats.ventas }}</strong>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <section class="col-xl-7">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="h5 fw-black text-uppercase m-0">Usuarios y roles</h3>
+            <span class="text-muted small">{{ stats.admins }} admin</span>
+        </div>
+        <div class="table-responsive bg-white shadow-sm">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th class="text-end">Accion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                        <tr>
+                            <td>
+                                <strong>{{ usuario.nombre|default:usuario.email }}</strong>
+                                <div class="small text-muted">{{ usuario.email }}</div>
+                            </td>
+                            <td><span class="badge bg-dark text-uppercase">{{ usuario.rol }}</span></td>
+                            <td class="text-end">
+                                {% if usuario.id_usuario == current_usuario.id_usuario %}
+                                    <span class="small text-muted">Tu cuenta</span>
+                                {% else %}
+                                    <form method="post" action="{% url 'admin_cambiar_rol' usuario.id_usuario %}" class="d-flex justify-content-end gap-2">
+                                        {% csrf_token %}
+                                        <select name="rol" class="form-select form-select-sm" style="max-width: 150px;">
+                                            {% for rol in roles %}
+                                                <option value="{{ rol }}" {% if rol == usuario.rol %}selected{% endif %}>{{ rol }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button class="btn btn-outline-primary btn-sm">Guardar</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="col-xl-5">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="h5 fw-black text-uppercase m-0">Ventas recientes</h3>
+            <span class="text-muted small">${{ stats.total_ventas|floatformat:2 }}</span>
+        </div>
+        <div class="bg-white shadow-sm">
+            {% for venta in ventas %}
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>Venta #{{ venta.id_venta }}</strong>
+                        <span>${{ venta.total_pago|floatformat:2 }}</span>
+                    </div>
+                    <div class="small text-muted">{{ venta.usuario.email }} · {{ venta.estado_envio }}</div>
+                </div>
+            {% empty %}
+                <p class="text-muted p-4 mb-0">No hay ventas registradas.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<section>
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h3 class="h5 fw-black text-uppercase m-0">Productos publicados</h3>
+        <span class="text-muted small">{{ stats.productos_activos }} activos</span>
+    </div>
+    <div class="table-responsive bg-white shadow-sm">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Vendedor</th>
+                    <th>Categoria</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th class="text-end">Accion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.vendedor.email|default:"Sin vendedor" }}</td>
+                        <td>{{ producto.categoria.nombre|default:"General" }}</td>
+                        <td>${{ producto.precio|floatformat:2 }}</td>
+                        <td>{{ producto.stock }}</td>
+                        <td>
+                            {% if producto.activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <form method="post" action="{% url 'admin_toggle_producto' producto.id_producto %}">
+                                {% csrf_token %}
+                                {% if producto.activo %}
+                                    <button class="btn btn-outline-danger btn-sm">Desactivar</button>
+                                {% else %}
+                                    <button class="btn btn-outline-primary btn-sm">Activar</button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No hay productos registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

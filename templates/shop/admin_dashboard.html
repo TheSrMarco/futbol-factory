@@ -168,7 +168,7 @@
                                                 <option value="{{ rol }}" {% if rol == usuario.rol %}selected{% endif %}>{{ rol }}</option>
                                             {% endfor %}
                                         </select>
-                                        <button class="btn btn-outline-primary btn-sm">Guardar</button>
+                                        <button class="btn btn-outline-primary btn-sm" data-confirm="Cambiar rol de este usuario?">Guardar</button>
                                     </form>
                                 {% endif %}
                             </td>
@@ -275,7 +275,7 @@
                                 <option value="{{ estado }}" {% if estado == devolucion.estado %}selected{% endif %}>{{ estado }}</option>
                             {% endfor %}
                         </select>
-                        <button class="btn btn-outline-primary btn-sm">Guardar</button>
+                        <button class="btn btn-outline-primary btn-sm" data-confirm="Actualizar estado de esta devolucion?">Guardar</button>
                     </form>
                 </div>
             {% empty %}
@@ -307,7 +307,7 @@
                                 <option value="{{ estado }}" {% if estado == ticket.estado %}selected{% endif %}>{{ estado }}</option>
                             {% endfor %}
                         </select>
-                        <button class="btn btn-outline-primary btn-sm">Guardar</button>
+                        <button class="btn btn-outline-primary btn-sm" data-confirm="Actualizar estado de este ticket?">Guardar</button>
                     </form>
                 </div>
             {% empty %}
@@ -383,9 +383,9 @@
                             <form method="post" action="{% url 'admin_toggle_producto' producto.id_producto %}">
                                 {% csrf_token %}
                                 {% if producto.activo %}
-                                    <button class="btn btn-outline-danger btn-sm">Desactivar</button>
+                                    <button class="btn btn-outline-danger btn-sm" data-confirm="Desactivar este producto del catalogo?">Desactivar</button>
                                 {% else %}
-                                    <button class="btn btn-outline-primary btn-sm">Activar</button>
+                                    <button class="btn btn-outline-primary btn-sm" data-confirm="Activar este producto en el catalogo?">Activar</button>
                                 {% endif %}
                             </form>
                         </td>

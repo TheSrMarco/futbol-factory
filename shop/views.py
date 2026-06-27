@@ -2,6 +2,7 @@ from decimal import Decimal
 from hashlib import sha256
 from urllib.parse import urlsplit
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.cache import cache
 from django.db import transaction
@@ -15,8 +16,8 @@ from .services import SESSION_USER_KEY, admin_required, get_current_usuario, log
 
 
 ROLES = {'admin', 'cliente', 'vendedor'}
-LOGIN_ATTEMPT_LIMIT = 5
-LOGIN_LOCK_SECONDS = 300
+LOGIN_ATTEMPT_LIMIT = settings.LOGIN_ATTEMPT_LIMIT
+LOGIN_LOCK_SECONDS = settings.LOGIN_LOCK_SECONDS
 ESTADOS_SOPORTE = {'abierto', 'en_revision', 'resuelto'}
 ESTADOS_DEVOLUCION = {'solicitada', 'en_revision', 'aprobada', 'rechazada'}
 
@@ -68,8 +69,10 @@ def home(request):
 def catalogo(request):
     categoria_id = request.GET.get('cat')
     productos = Producto.objects.filter(activo=True).select_related('categoria')
-    if categoria_id:
-        productos = productos.filter(categoria_id=categoria_id)
+    categoria_actual = None
+    if categoria_id and categoria_id.isdigit():
+        categoria_actual = int(categoria_id)
+        productos = productos.filter(categoria_id=categoria_actual)
 
     return render(
         request,
@@ -77,7 +80,7 @@ def catalogo(request):
         {
             'productos': productos,
             'categorias': Categoria.objects.all().order_by('nombre'),
-            'categoria_actual': int(categoria_id) if categoria_id and categoria_id.isdigit() else None,
+            'categoria_actual': categoria_actual,
         },
     )
 

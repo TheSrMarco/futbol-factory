@@ -165,8 +165,16 @@ Vendedor: vendedor@ffactory.com / root
 - `DB_HOST`: host de PostgreSQL.
 - `DB_PORT`: puerto de PostgreSQL.
 - `DB_NAME`: nombre de la base de datos.
+- `DATABASE_URL`: alternativa unica para configurar PostgreSQL en despliegues.
+- `DB_CONN_MAX_AGE`: segundos para reutilizar conexiones a base de datos.
 - `SESSION_COOKIE_SECURE`: `true` solo con HTTPS.
 - `SESSION_COOKIE_SAMESITE`: politica SameSite de cookies.
+- `CSRF_COOKIE_SECURE`: `true` solo con HTTPS.
+- `CSRF_COOKIE_SAMESITE`: politica SameSite del token CSRF.
+- `LOGIN_ATTEMPT_LIMIT`: intentos fallidos permitidos antes del bloqueo temporal.
+- `LOGIN_LOCK_SECONDS`: duracion del bloqueo temporal de login.
+- `SECURE_SSL_REDIRECT`: redireccion forzada a HTTPS para despliegue.
+- `SECURE_HSTS_SECONDS`: tiempo HSTS cuando el sitio ya corre sobre HTTPS.
 
 ## Decisiones de migracion
 
@@ -179,6 +187,8 @@ Vendedor: vendedor@ffactory.com / root
 - Los formularios Django usan `{% csrf_token %}` y el middleware CSRF.
 - El cierre de compra ahora usa `transaction.atomic()` y valida stock/precio
   vigente antes de crear la venta.
+- Los mensajes de Django se mapean a alertas Bootstrap y las acciones sensibles
+  piden confirmacion en el navegador.
 
 ## Buenas practicas pendientes
 

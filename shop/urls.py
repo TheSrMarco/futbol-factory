@@ -12,6 +12,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('perfil/', views.perfil, name='perfil'),
     path('mis-compras/', views.mis_compras, name='mis_compras'),
+    path('soporte/', views.soporte, name='soporte'),
+    path('mis-compras/<int:id_venta>/devolucion/', views.solicitar_devolucion, name='solicitar_devolucion'),
     path('carrito/', views.ver_carrito, name='ver_carrito'),
     path('carrito/agregar/<int:id_producto>/', views.agregar_al_carrito, name='agregar_al_carrito'),
     path('carrito/sumar/<int:id_producto>/', views.sumar_cantidad, name='sumar_cantidad'),
@@ -27,4 +29,6 @@ urlpatterns = [
     path('admin-panel/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-panel/usuarios/<int:id_usuario>/rol/', views.admin_cambiar_rol, name='admin_cambiar_rol'),
     path('admin-panel/productos/<int:id_producto>/estado/', views.admin_toggle_producto, name='admin_toggle_producto'),
+    path('admin-panel/soporte/<int:id_soporte>/estado/', views.admin_actualizar_soporte, name='admin_actualizar_soporte'),
+    path('admin-panel/devoluciones/<int:id_devolucion>/estado/', views.admin_actualizar_devolucion, name='admin_actualizar_devolucion'),
 ]

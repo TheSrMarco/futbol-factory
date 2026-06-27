@@ -39,6 +39,7 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item fw-bold" href="{% url 'perfil' %}">Mi perfil</a></li>
                                 <li><a class="dropdown-item fw-bold" href="{% url 'mis_compras' %}">Mis compras</a></li>
+                                <li><a class="dropdown-item fw-bold" href="{% url 'soporte' %}">Soporte</a></li>
                                 {% if current_usuario.rol == 'admin' %}
                                     <li><a class="dropdown-item fw-bold" href="{% url 'admin_dashboard' %}">Panel admin</a></li>
                                 {% elif current_usuario.rol == 'vendedor' %}

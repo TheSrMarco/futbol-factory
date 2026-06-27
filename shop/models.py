@@ -131,6 +131,47 @@ class Sesion(models.Model):
         db_table = 'sesiones'
 
 
+class Soporte(models.Model):
+    id_soporte = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        models.CASCADE,
+        db_column='id_usuario',
+        related_name='tickets_soporte',
+    )
+    asunto = models.CharField(max_length=120)
+    mensaje = models.TextField()
+    estado = models.CharField(max_length=30, default='abierto')
+    fecha_creacion = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'soporte'
+
+
+class Devolucion(models.Model):
+    id_devolucion = models.AutoField(primary_key=True)
+    venta = models.ForeignKey(
+        Venta,
+        models.CASCADE,
+        db_column='id_venta',
+        related_name='devoluciones',
+    )
+    usuario = models.ForeignKey(
+        Usuario,
+        models.CASCADE,
+        db_column='id_usuario',
+        related_name='devoluciones',
+    )
+    motivo = models.TextField()
+    estado = models.CharField(max_length=30, default='solicitada')
+    fecha_solicitud = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'devoluciones'
+
+
 class DetalleVenta(models.Model):
     id_detalle = models.AutoField(primary_key=True)
     venta = models.ForeignKey(

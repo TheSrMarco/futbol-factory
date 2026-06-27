@@ -67,11 +67,18 @@
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm p-4 h-100">
-                <span class="badge bg-warning text-dark align-self-start mb-3">Pendiente productivo</span>
-                <strong class="text-uppercase">Devoluciones y soporte</strong>
-                <span class="small text-muted">Aun no tienen tablas ni flujo propio en el SQL actual.</span>
-            </div>
+            <a href="#devoluciones" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <strong class="text-uppercase">Devoluciones</strong>
+                <span class="small text-muted">Revisar solicitudes y cambiar su estado.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#soporte" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <strong class="text-uppercase">Soporte</strong>
+                <span class="small text-muted">Atender tickets enviados por usuarios.</span>
+            </a>
         </div>
     </div>
 </section>
@@ -111,6 +118,18 @@
         <div class="card border-0 shadow-sm p-4 h-100">
             <span class="text-muted">Accesos</span>
             <strong class="display-6">{{ stats.sesiones }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Tickets abiertos</span>
+            <strong class="display-6">{{ stats.tickets_abiertos }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Devoluciones</span>
+            <strong class="display-6">{{ stats.devoluciones_pendientes }}</strong>
         </div>
     </div>
 </div>
@@ -227,6 +246,72 @@
                 </div>
             {% empty %}
                 <p class="text-muted p-4 mb-0">No hay pagos registrados. Se crean al finalizar una compra.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<div class="row g-4 mb-4">
+    <section class="col-xl-6" id="devoluciones">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="h5 fw-black text-uppercase m-0">Devoluciones</h3>
+            <span class="text-muted small">{{ stats.devoluciones_pendientes }} pendientes</span>
+        </div>
+        <div class="bg-white shadow-sm">
+            {% for devolucion in devoluciones %}
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between gap-3">
+                        <strong>Solicitud #{{ devolucion.id_devolucion }}</strong>
+                        <span class="badge bg-dark">{{ devolucion.estado }}</span>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        Compra #{{ devolucion.venta.id_venta }} - {{ devolucion.usuario.email }} - {{ devolucion.fecha_solicitud|date:"d/m/Y H:i" }}
+                    </div>
+                    <p class="mb-3">{{ devolucion.motivo }}</p>
+                    <form method="post" action="{% url 'admin_actualizar_devolucion' devolucion.id_devolucion %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <select name="estado" class="form-select form-select-sm">
+                            {% for estado in estados_devolucion %}
+                                <option value="{{ estado }}" {% if estado == devolucion.estado %}selected{% endif %}>{{ estado }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-outline-primary btn-sm">Guardar</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p class="text-muted p-4 mb-0">No hay solicitudes de devolucion.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="col-xl-6" id="soporte">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="h5 fw-black text-uppercase m-0">Soporte</h3>
+            <span class="text-muted small">{{ stats.tickets_abiertos }} abiertos</span>
+        </div>
+        <div class="bg-white shadow-sm">
+            {% for ticket in tickets %}
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between gap-3">
+                        <strong>Ticket #{{ ticket.id_soporte }} - {{ ticket.asunto }}</strong>
+                        <span class="badge bg-dark">{{ ticket.estado }}</span>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        {{ ticket.usuario.email }} - {{ ticket.fecha_creacion|date:"d/m/Y H:i" }}
+                    </div>
+                    <p class="mb-3">{{ ticket.mensaje }}</p>
+                    <form method="post" action="{% url 'admin_actualizar_soporte' ticket.id_soporte %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <select name="estado" class="form-select form-select-sm">
+                            {% for estado in estados_soporte %}
+                                <option value="{{ estado }}" {% if estado == ticket.estado %}selected{% endif %}>{{ estado }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-outline-primary btn-sm">Guardar</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p class="text-muted p-4 mb-0">No hay tickets de soporte.</p>
             {% endfor %}
         </div>
     </section>

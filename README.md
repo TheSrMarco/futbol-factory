@@ -31,12 +31,12 @@ La version actual conserva:
 - Templates renderizados desde servidor.
 - Catalogo, login/registro, carrito, compras, perfil, dashboard de vendedor y
   panel administrador con usuarios, roles, categorias, productos, ventas, pagos
-  y accesos.
+  devoluciones, soporte y accesos.
 - CSRF en formularios mediante middleware de Django.
+- Bloqueo temporal tras varios intentos fallidos de inicio de sesion.
 
 Quedan como pendientes productivos los controles avanzados documentados para una
-version final: pasarela de pago tokenizada, devoluciones, soporte, CAPTCHA, 2FA,
-rate limiting y despliegue HTTPS.
+version final: pasarela de pago tokenizada, CAPTCHA, 2FA y despliegue HTTPS.
 
 ## Como se ejecuta
 
@@ -76,15 +76,16 @@ CREATE DATABASE ffactory;
 psql -U postgres -d ffactory -f database.sql
 ```
 
-7. Aplica las migraciones internas de Django.
+7. Aplica las migraciones de Django.
 
 ```powershell
 python manage.py migrate
 ```
 
 Este paso crea tablas internas como las usadas para registrar migraciones y
-sesiones. Las tablas principales del proyecto (`usuarios`, `productos`,
-`carrito`, `ventas`, etc.) vienen del archivo `database.sql`.
+sesiones, ademas de las extensiones Django para soporte y devoluciones. Las
+tablas principales del proyecto (`usuarios`, `productos`, `carrito`, `ventas`,
+etc.) vienen del archivo `database.sql`.
 
 8. Verifica que PostgreSQL este encendido.
 
@@ -131,7 +132,9 @@ apagado o las credenciales de `.env` no coinciden.
 - `/catalogo/` catalogo de productos
 - `/carrito/` carrito de compras
 - `/mis-compras/` historial de compras
+- `/mis-compras/<id>/devolucion/` solicitud de devolucion
 - `/perfil/` perfil de usuario
+- `/soporte/` tickets de soporte
 - `/dashboard/` panel de vendedor
 - `/admin-panel/` panel administrador
 
@@ -142,7 +145,7 @@ El prototipo maneja tres roles principales:
 - `cliente`: compra productos, administra carrito y consulta historial.
 - `vendedor`: mantiene las funciones de cliente y administra su inventario.
 - `admin`: revisa usuarios, cambia roles, consulta categorias, productos,
-  ventas, pagos basicos y auditoria de accesos.
+  ventas, pagos basicos, devoluciones, soporte y auditoria de accesos.
 
 Usuarios demo:
 

@@ -6,16 +6,27 @@
 <h2 class="fw-black text-uppercase mb-4">Mis compras</h2>
 {% for compra in compras %}
     <div class="card border-0 shadow-sm p-4 mb-3">
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between gap-3">
             <strong>Compra #{{ compra.id_venta }}</strong>
             <span>${{ compra.total_pago|floatformat:2 }}</span>
         </div>
-        <p class="text-muted mb-2">{{ compra.fecha }} · {{ compra.estado_envio }}</p>
+        <p class="text-muted mb-2">{{ compra.fecha }} - {{ compra.estado_envio }}</p>
         <ul class="mb-0">
             {% for detalle in compra.detalles.all %}
-                <li>{{ detalle.producto.nombre }} x{{ detalle.cantidad }} · ${{ detalle.precio_unitario|floatformat:2 }}</li>
+                <li>{{ detalle.producto.nombre }} x{{ detalle.cantidad }} - ${{ detalle.precio_unitario|floatformat:2 }}</li>
             {% endfor %}
         </ul>
+        <div class="mt-3">
+            {% with devoluciones=compra.devoluciones.all %}
+                {% if devoluciones %}
+                    {% for devolucion in devoluciones %}
+                        <span class="badge bg-dark me-2">Devolucion: {{ devolucion.estado }}</span>
+                    {% endfor %}
+                {% else %}
+                    <a href="{% url 'solicitar_devolucion' compra.id_venta %}" class="btn btn-outline-primary btn-sm">Solicitar devolucion</a>
+                {% endif %}
+            {% endwith %}
+        </div>
     </div>
 {% empty %}
     <p class="text-muted">Aun no tienes compras registradas.</p>

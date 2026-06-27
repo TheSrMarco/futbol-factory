@@ -1,0 +1,48 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Soporte{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-black text-uppercase mb-0">Soporte</h2>
+        <p class="text-muted mb-0">Registra dudas, problemas con pedidos o solicitudes generales.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <section class="col-lg-5">
+        <div class="card border-0 shadow-sm p-4">
+            <h3 class="h5 fw-black text-uppercase mb-3">Nuevo ticket</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Asunto</label>
+                    <input type="text" name="asunto" class="form-control" maxlength="120" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mensaje</label>
+                    <textarea name="mensaje" class="form-control" rows="6" required></textarea>
+                </div>
+                <button class="btn btn-primary w-100">Enviar ticket</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="col-lg-7">
+        <h3 class="h5 fw-black text-uppercase mb-3">Mis tickets</h3>
+        {% for ticket in tickets %}
+            <div class="card border-0 shadow-sm p-4 mb-3">
+                <div class="d-flex justify-content-between gap-3">
+                    <strong>{{ ticket.asunto }}</strong>
+                    <span class="badge bg-dark">{{ ticket.estado }}</span>
+                </div>
+                <p class="text-muted small mb-2">{{ ticket.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                <p class="mb-0">{{ ticket.mensaje }}</p>
+            </div>
+        {% empty %}
+            <p class="text-muted">Aun no tienes tickets de soporte.</p>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

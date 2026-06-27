@@ -1,18 +1,24 @@
 from decimal import Decimal
+from hashlib import sha256
 from urllib.parse import urlsplit
 
 from django.contrib import messages
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Count, F, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .models import Carrito, Categoria, DetalleVenta, Pago, Producto, Sesion, Usuario, Venta
+from .models import Carrito, Categoria, DetalleVenta, Devolucion, Pago, Producto, Sesion, Soporte, Usuario, Venta
 from .services import SESSION_USER_KEY, admin_required, get_current_usuario, login_required_view, vendedor_required
 
 
 ROLES = {'admin', 'cliente', 'vendedor'}
+LOGIN_ATTEMPT_LIMIT = 5
+LOGIN_LOCK_SECONDS = 300
+ESTADOS_SOPORTE = {'abierto', 'en_revision', 'resuelto'}
+ESTADOS_DEVOLUCION = {'solicitada', 'en_revision', 'aprobada', 'rechazada'}
 
 
 def _safe_next_url(request):
@@ -20,6 +26,38 @@ def _safe_next_url(request):
     if next_url and next_url.startswith('/') and not urlsplit(next_url).netloc:
         return next_url
     return '/'
+
+
+def _client_ip(request):
+    forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', 'local')
+
+
+def _login_cache_key(request, email, suffix):
+    raw_key = f'{_client_ip(request)}:{email}'.encode('utf-8')
+    digest = sha256(raw_key).hexdigest()
+    return f'ffactory:login:{suffix}:{digest}'
+
+
+def _is_login_blocked(request, email):
+    return cache.get(_login_cache_key(request, email, 'lock')) is True
+
+
+def _register_failed_login(request, email):
+    attempts_key = _login_cache_key(request, email, 'attempts')
+    attempts = cache.get(attempts_key, 0) + 1
+    if attempts >= LOGIN_ATTEMPT_LIMIT:
+        cache.set(_login_cache_key(request, email, 'lock'), True, LOGIN_LOCK_SECONDS)
+        cache.delete(attempts_key)
+        return
+    cache.set(attempts_key, attempts, LOGIN_LOCK_SECONDS)
+
+
+def _clear_failed_login(request, email):
+    cache.delete(_login_cache_key(request, email, 'attempts'))
+    cache.delete(_login_cache_key(request, email, 'lock'))
 
 
 def home(request):
@@ -58,11 +96,17 @@ def login_view(request):
         messages.error(request, 'Correo y contrasena son obligatorios.')
         return redirect('login')
 
+    if _is_login_blocked(request, email):
+        messages.error(request, 'Demasiados intentos fallidos. Intenta de nuevo en unos minutos.')
+        return redirect('login')
+
     usuario = Usuario.objects.filter(email=email).first()
     if not usuario or not check_password_hash(usuario.password, password):
+        _register_failed_login(request, email)
         messages.error(request, 'Correo o contrasena incorrectos.')
         return redirect('login')
 
+    _clear_failed_login(request, email)
     request.session.cycle_key()
     request.session[SESSION_USER_KEY] = usuario.id_usuario
     Sesion.objects.create(usuario=usuario, fecha_login=timezone.now())
@@ -117,8 +161,65 @@ def perfil(request):
 @login_required_view
 def mis_compras(request):
     usuario = get_current_usuario(request)
-    compras = Venta.objects.filter(usuario=usuario).prefetch_related('detalles__producto').order_by('-fecha')
+    compras = Venta.objects.filter(usuario=usuario).prefetch_related('detalles__producto', 'devoluciones').order_by('-fecha')
     return render(request, 'shop/mis_compras.html', {'compras': compras})
+
+
+@login_required_view
+def soporte(request):
+    usuario = get_current_usuario(request)
+    if request.method == 'POST':
+        asunto = (request.POST.get('asunto') or '').strip()
+        mensaje = (request.POST.get('mensaje') or '').strip()
+        if not asunto or not mensaje:
+            messages.error(request, 'Asunto y mensaje son obligatorios.')
+            return redirect('soporte')
+
+        Soporte.objects.create(
+            usuario=usuario,
+            asunto=asunto,
+            mensaje=mensaje,
+            estado='abierto',
+            fecha_creacion=timezone.now(),
+        )
+        messages.success(request, 'Ticket de soporte registrado.')
+        return redirect('soporte')
+
+    tickets = Soporte.objects.filter(usuario=usuario).order_by('-fecha_creacion', '-id_soporte')
+    return render(request, 'shop/soporte.html', {'tickets': tickets})
+
+
+@login_required_view
+def solicitar_devolucion(request, id_venta):
+    usuario = get_current_usuario(request)
+    venta = get_object_or_404(
+        Venta.objects.prefetch_related('detalles__producto', 'devoluciones'),
+        pk=id_venta,
+        usuario=usuario,
+    )
+
+    if request.method == 'POST':
+        motivo = (request.POST.get('motivo') or '').strip()
+        if not motivo:
+            messages.error(request, 'Describe el motivo de la devolucion.')
+            return redirect('solicitar_devolucion', id_venta=id_venta)
+
+        if Devolucion.objects.filter(venta=venta, usuario=usuario).exists():
+            messages.info(request, 'Ya existe una solicitud para esta compra.')
+            return redirect('mis_compras')
+
+        Devolucion.objects.create(
+            venta=venta,
+            usuario=usuario,
+            motivo=motivo,
+            estado='solicitada',
+            fecha_solicitud=timezone.now(),
+        )
+        messages.success(request, 'Solicitud de devolucion registrada.')
+        return redirect('mis_compras')
+
+    devolucion = Devolucion.objects.filter(venta=venta, usuario=usuario).first()
+    return render(request, 'shop/devolucion_form.html', {'venta': venta, 'devolucion': devolucion})
 
 
 @login_required_view
@@ -364,6 +465,8 @@ def admin_dashboard(request):
     ventas = Venta.objects.select_related('usuario').prefetch_related('detalles__producto').order_by('-fecha')
     pagos = Pago.objects.select_related('venta', 'venta__usuario').order_by('-fecha_pago', '-id_pago')
     sesiones = Sesion.objects.select_related('usuario').order_by('-fecha_login', '-id_sesion')
+    tickets = Soporte.objects.select_related('usuario').order_by('-fecha_creacion', '-id_soporte')
+    devoluciones = Devolucion.objects.select_related('venta', 'usuario').order_by('-fecha_solicitud', '-id_devolucion')
     total_ventas = ventas.aggregate(total=Sum('total_pago'))['total'] or Decimal('0.00')
 
     stats = {
@@ -376,6 +479,8 @@ def admin_dashboard(request):
         'ventas': ventas.count(),
         'pagos': pagos.count(),
         'sesiones': sesiones.count(),
+        'tickets_abiertos': tickets.exclude(estado='resuelto').count(),
+        'devoluciones_pendientes': devoluciones.exclude(estado__in=['aprobada', 'rechazada']).count(),
         'total_ventas': total_ventas,
     }
 
@@ -389,8 +494,12 @@ def admin_dashboard(request):
             'ventas': ventas[:10],
             'pagos': pagos[:10],
             'sesiones': sesiones[:10],
+            'tickets': tickets[:10],
+            'devoluciones': devoluciones[:10],
             'stats': stats,
             'roles': sorted(ROLES),
+            'estados_soporte': sorted(ESTADOS_SOPORTE),
+            'estados_devolucion': sorted(ESTADOS_DEVOLUCION),
         },
     )
 
@@ -426,4 +535,38 @@ def admin_toggle_producto(request, id_producto):
     producto.save(update_fields=['activo'])
     estado = 'activado' if producto.activo else 'desactivado'
     messages.info(request, f'Producto {estado}: {producto.nombre}.')
+    return redirect('admin_dashboard')
+
+
+@admin_required
+def admin_actualizar_soporte(request, id_soporte):
+    if request.method != 'POST':
+        return redirect('admin_dashboard')
+
+    ticket = get_object_or_404(Soporte, pk=id_soporte)
+    estado = request.POST.get('estado')
+    if estado not in ESTADOS_SOPORTE:
+        messages.error(request, 'Estado de soporte invalido.')
+        return redirect('admin_dashboard')
+
+    ticket.estado = estado
+    ticket.save(update_fields=['estado'])
+    messages.success(request, f'Ticket #{ticket.id_soporte} actualizado.')
+    return redirect('admin_dashboard')
+
+
+@admin_required
+def admin_actualizar_devolucion(request, id_devolucion):
+    if request.method != 'POST':
+        return redirect('admin_dashboard')
+
+    devolucion = get_object_or_404(Devolucion, pk=id_devolucion)
+    estado = request.POST.get('estado')
+    if estado not in ESTADOS_DEVOLUCION:
+        messages.error(request, 'Estado de devolucion invalido.')
+        return redirect('admin_dashboard')
+
+    devolucion.estado = estado
+    devolucion.save(update_fields=['estado'])
+    messages.success(request, f'Devolucion #{devolucion.id_devolucion} actualizada.')
     return redirect('admin_dashboard')

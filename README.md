@@ -73,7 +73,17 @@ CREATE DATABASE ffactory;
 psql -U postgres -d ffactory -f database.sql
 ```
 
-7. Verifica que PostgreSQL este encendido.
+7. Aplica las migraciones internas de Django.
+
+```powershell
+python manage.py migrate
+```
+
+Este paso crea tablas internas como las usadas para registrar migraciones y
+sesiones. Las tablas principales del proyecto (`usuarios`, `productos`,
+`carrito`, `ventas`, etc.) vienen del archivo `database.sql`.
+
+8. Verifica que PostgreSQL este encendido.
 
 En Windows puedes revisarlo desde `services.msc`. El servicio suele llamarse
 `postgresql-x64-18` o parecido. Si tienes permisos de administrador tambien
@@ -83,7 +93,13 @@ puedes usar:
 Start-Service -Name postgresql-x64-18
 ```
 
-8. Arranca Django.
+9. Verifica la configuracion.
+
+```powershell
+python manage.py check
+```
+
+10. Arranca Django.
 
 ```powershell
 python manage.py runserver
@@ -95,7 +111,7 @@ Tambien puedes usar el wrapper de compatibilidad:
 python script.py
 ```
 
-9. Abre la aplicacion.
+11. Abre la aplicacion.
 
 ```text
 http://127.0.0.1:8000/login/

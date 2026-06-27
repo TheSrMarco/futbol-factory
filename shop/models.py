@@ -99,6 +99,38 @@ class Venta(models.Model):
         db_table = 'ventas'
 
 
+class Pago(models.Model):
+    id_pago = models.AutoField(primary_key=True)
+    venta = models.ForeignKey(
+        Venta,
+        models.CASCADE,
+        db_column='id_venta',
+        related_name='pagos',
+    )
+    metodo_pago = models.CharField(max_length=50, blank=True, null=True)
+    estado_pago = models.CharField(max_length=50, blank=True, null=True)
+    fecha_pago = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'pago'
+
+
+class Sesion(models.Model):
+    id_sesion = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        models.CASCADE,
+        db_column='id_usuario',
+        related_name='sesiones',
+    )
+    fecha_login = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'sesiones'
+
+
 class DetalleVenta(models.Model):
     id_detalle = models.AutoField(primary_key=True)
     venta = models.ForeignKey(

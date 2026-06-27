@@ -6,10 +6,75 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="fw-black text-uppercase mb-0">Panel administrador</h2>
-        <p class="text-muted mb-0">Control de usuarios, productos y ventas.</p>
+        <p class="text-muted mb-0">Control de usuarios, roles, categorias, productos, ventas, pagos y accesos.</p>
     </div>
     <span class="badge bg-dark px-3 py-2 text-uppercase">Rol admin</span>
 </div>
+
+<section class="mb-4">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h3 class="h5 fw-black text-uppercase m-0">Interfaces del administrador</h3>
+        <span class="text-muted small">Segun documentacion S-SDLC</span>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4">
+            <a href="#usuarios" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <strong class="text-uppercase">Usuarios y roles</strong>
+                <span class="small text-muted">Cambiar entre cliente, vendedor y admin.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#productos" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <strong class="text-uppercase">Productos</strong>
+                <span class="small text-muted">Revisar publicaciones y activar/desactivar articulos.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#ventas" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <strong class="text-uppercase">Pedidos y ventas</strong>
+                <span class="small text-muted">Consultar ventas recientes y totales registrados.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#categorias" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <strong class="text-uppercase">Categorias</strong>
+                <span class="small text-muted">Consultar categorias y cantidad de productos.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#pagos" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado basico</span>
+                <strong class="text-uppercase">Pagos</strong>
+                <span class="small text-muted">Consultar pagos registrados por cada venta.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#accesos" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Implementado basico</span>
+                <strong class="text-uppercase">Auditoria de accesos</strong>
+                <span class="small text-muted">Ver ultimos inicios de sesion registrados.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'catalogo' %}" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-primary align-self-start mb-3">Vista publica</span>
+                <strong class="text-uppercase">Catalogo</strong>
+                <span class="small text-muted">Validar lo que ve cliente o visitante.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <span class="badge bg-warning text-dark align-self-start mb-3">Pendiente productivo</span>
+                <strong class="text-uppercase">Devoluciones y soporte</strong>
+                <span class="small text-muted">Aun no tienen tablas ni flujo propio en el SQL actual.</span>
+            </div>
+        </div>
+    </div>
+</section>
 
 <div class="row g-4 mb-4">
     <div class="col-sm-6 col-xl-3">
@@ -36,10 +101,22 @@
             <strong class="display-6">{{ stats.ventas }}</strong>
         </div>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Pagos</span>
+            <strong class="display-6">{{ stats.pagos }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Accesos</span>
+            <strong class="display-6">{{ stats.sesiones }}</strong>
+        </div>
+    </div>
 </div>
 
 <div class="row g-4 mb-4">
-    <section class="col-xl-7">
+    <section class="col-xl-7" id="usuarios">
         <div class="d-flex justify-content-between align-items-end mb-3">
             <h3 class="h5 fw-black text-uppercase m-0">Usuarios y roles</h3>
             <span class="text-muted small">{{ stats.admins }} admin</span>
@@ -83,7 +160,36 @@
         </div>
     </section>
 
-    <section class="col-xl-5">
+    <section class="col-xl-5" id="categorias">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="h5 fw-black text-uppercase m-0">Categorias</h3>
+            <span class="text-muted small">{{ stats.categorias }} registradas</span>
+        </div>
+        <div class="table-responsive bg-white shadow-sm">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th class="text-end">Productos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categoria in categorias %}
+                        <tr>
+                            <td>{{ categoria.nombre }}</td>
+                            <td class="text-end">{{ categoria.total_productos }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="text-center text-muted py-4">No hay categorias registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<div class="row g-4 mb-4">
+    <section class="col-xl-6" id="ventas">
         <div class="d-flex justify-content-between align-items-end mb-3">
             <h3 class="h5 fw-black text-uppercase m-0">Ventas recientes</h3>
             <span class="text-muted small">${{ stats.total_ventas|floatformat:2 }}</span>
@@ -95,16 +201,67 @@
                         <strong>Venta #{{ venta.id_venta }}</strong>
                         <span>${{ venta.total_pago|floatformat:2 }}</span>
                     </div>
-                    <div class="small text-muted">{{ venta.usuario.email }} · {{ venta.estado_envio }}</div>
+                    <div class="small text-muted">{{ venta.usuario.email }} - {{ venta.estado_envio }}</div>
                 </div>
             {% empty %}
                 <p class="text-muted p-4 mb-0">No hay ventas registradas.</p>
             {% endfor %}
         </div>
     </section>
+
+    <section class="col-xl-6" id="pagos">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="h5 fw-black text-uppercase m-0">Pagos</h3>
+            <span class="text-muted small">{{ stats.pagos }} registrados</span>
+        </div>
+        <div class="bg-white shadow-sm">
+            {% for pago in pagos %}
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>Pago #{{ pago.id_pago }}</strong>
+                        <span class="badge bg-dark">{{ pago.estado_pago|default:"pendiente" }}</span>
+                    </div>
+                    <div class="small text-muted">
+                        Venta #{{ pago.venta.id_venta }} - {{ pago.venta.usuario.email }} - {{ pago.metodo_pago|default:"sin metodo" }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted p-4 mb-0">No hay pagos registrados. Se crean al finalizar una compra.</p>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 
-<section>
+<section class="mb-4" id="accesos">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h3 class="h5 fw-black text-uppercase m-0">Auditoria de accesos</h3>
+        <span class="text-muted small">Ultimos inicios de sesion</span>
+    </div>
+    <div class="table-responsive bg-white shadow-sm">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Fecha login</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sesion in sesiones %}
+                    <tr>
+                        <td>{{ sesion.usuario.email }}</td>
+                        <td><span class="badge bg-dark">{{ sesion.usuario.rol }}</span></td>
+                        <td>{{ sesion.fecha_login|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="text-center text-muted py-4">No hay accesos registrados todavia.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section id="productos">
     <div class="d-flex justify-content-between align-items-end mb-3">
         <h3 class="h5 fw-black text-uppercase m-0">Productos publicados</h3>
         <span class="text-muted small">{{ stats.productos_activos }} activos</span>

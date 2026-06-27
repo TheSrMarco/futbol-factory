@@ -30,11 +30,13 @@ La version actual conserva:
 - Bootstrap para la interfaz visual.
 - Templates renderizados desde servidor.
 - Catalogo, login/registro, carrito, compras, perfil, dashboard de vendedor y
-  panel administrador.
+  panel administrador con usuarios, roles, categorias, productos, ventas, pagos
+  y accesos.
 - CSRF en formularios mediante middleware de Django.
 
 Quedan como pendientes productivos los controles avanzados documentados para una
-version final: pagos tokenizados, CAPTCHA, 2FA, rate limiting y despliegue HTTPS.
+version final: pasarela de pago tokenizada, devoluciones, soporte, CAPTCHA, 2FA,
+rate limiting y despliegue HTTPS.
 
 ## Como se ejecuta
 
@@ -139,7 +141,8 @@ El prototipo maneja tres roles principales:
 
 - `cliente`: compra productos, administra carrito y consulta historial.
 - `vendedor`: mantiene las funciones de cliente y administra su inventario.
-- `admin`: revisa usuarios, cambia roles, consulta productos y revisa ventas.
+- `admin`: revisa usuarios, cambia roles, consulta categorias, productos,
+  ventas, pagos basicos y auditoria de accesos.
 
 Usuarios demo:
 

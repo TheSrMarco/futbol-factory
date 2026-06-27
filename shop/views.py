@@ -3,12 +3,12 @@ from urllib.parse import urlsplit
 
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import F, Sum
+from django.db.models import Count, F, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .models import Carrito, Categoria, DetalleVenta, Producto, Usuario, Venta
+from .models import Carrito, Categoria, DetalleVenta, Pago, Producto, Sesion, Usuario, Venta
 from .services import SESSION_USER_KEY, admin_required, get_current_usuario, login_required_view, vendedor_required
 
 
@@ -65,6 +65,7 @@ def login_view(request):
 
     request.session.cycle_key()
     request.session[SESSION_USER_KEY] = usuario.id_usuario
+    Sesion.objects.create(usuario=usuario, fecha_login=timezone.now())
     return redirect(_safe_next_url(request))
 
 
@@ -226,6 +227,12 @@ def finalizar_compra(request):
             total_pago=total,
             estado_envio='pendiente',
         )
+        Pago.objects.create(
+            venta=venta,
+            metodo_pago='simulado',
+            estado_pago='pendiente',
+            fecha_pago=timezone.now(),
+        )
 
         for item in items:
             producto = productos[item.producto_id]
@@ -352,8 +359,11 @@ def eliminar_producto(request, id_producto):
 @admin_required
 def admin_dashboard(request):
     usuarios = Usuario.objects.all().order_by('id_usuario')
+    categorias = Categoria.objects.annotate(total_productos=Count('productos')).order_by('nombre')
     productos = Producto.objects.select_related('categoria', 'vendedor').order_by('-id_producto')
     ventas = Venta.objects.select_related('usuario').prefetch_related('detalles__producto').order_by('-fecha')
+    pagos = Pago.objects.select_related('venta', 'venta__usuario').order_by('-fecha_pago', '-id_pago')
+    sesiones = Sesion.objects.select_related('usuario').order_by('-fecha_login', '-id_sesion')
     total_ventas = ventas.aggregate(total=Sum('total_pago'))['total'] or Decimal('0.00')
 
     stats = {
@@ -361,8 +371,11 @@ def admin_dashboard(request):
         'clientes': usuarios.filter(rol='cliente').count(),
         'vendedores': usuarios.filter(rol='vendedor').count(),
         'admins': usuarios.filter(rol='admin').count(),
+        'categorias': categorias.count(),
         'productos_activos': productos.filter(activo=True).count(),
         'ventas': ventas.count(),
+        'pagos': pagos.count(),
+        'sesiones': sesiones.count(),
         'total_ventas': total_ventas,
     }
 
@@ -371,8 +384,11 @@ def admin_dashboard(request):
         'shop/admin_dashboard.html',
         {
             'usuarios': usuarios,
+            'categorias': categorias,
             'productos': productos[:20],
             'ventas': ventas[:10],
+            'pagos': pagos[:10],
+            'sesiones': sesiones[:10],
             'stats': stats,
             'roles': sorted(ROLES),
         },

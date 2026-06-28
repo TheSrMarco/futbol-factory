@@ -3,12 +3,34 @@
 {% block title %}Quiero vender{% endblock %}
 
 {% block content %}
-<div class="card border-0 shadow-sm p-5 text-center">
-    <h2 class="fw-black text-uppercase">Convertir cuenta a vendedor</h2>
-    <p class="text-muted">Podras publicar productos y administrar tu inventario.</p>
-    <form method="post" action="{% url 'convertir_vendedor' %}">
-        {% csrf_token %}
-        <button class="btn btn-primary btn-lg">Activar modo vendedor</button>
-    </form>
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm p-5">
+            <h2 class="fw-black text-uppercase">Solicitar cuenta de vendedor</h2>
+            <p class="text-muted">
+                Un administrador revisara tu solicitud antes de habilitar la publicacion de productos.
+            </p>
+
+            {% if solicitud %}
+                <div class="alert alert-info mb-0">
+                    Tu solicitud esta en estado: <strong>{{ solicitud.estado }}</strong>.
+                    {% if solicitud.estado == 'rechazada' %}
+                        Puedes enviar una nueva solicitud con mas informacion.
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if not solicitud or solicitud.estado == 'rechazada' %}
+                <form method="post" action="{% url 'convertir_vendedor' %}" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Motivo</label>
+                        <textarea name="mensaje" class="form-control" rows="5" placeholder="Describe que tipo de productos quieres vender y por que solicitas acceso."></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-lg">Enviar solicitud</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

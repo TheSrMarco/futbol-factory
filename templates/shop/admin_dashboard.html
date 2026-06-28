@@ -19,42 +19,42 @@
     <div class="row g-3">
         <div class="col-md-6 col-xl-4">
             <a href="#usuarios" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
                 <strong class="text-uppercase">Usuarios y roles</strong>
-                <span class="small text-muted">Cambiar entre cliente, vendedor y admin.</span>
+                <span class="small text-muted">Administrar roles y revisar solicitudes de vendedor.</span>
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#productos" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
                 <strong class="text-uppercase">Productos</strong>
                 <span class="small text-muted">Revisar publicaciones y activar/desactivar articulos.</span>
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#ventas" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
                 <strong class="text-uppercase">Pedidos y ventas</strong>
                 <span class="small text-muted">Consultar ventas recientes y totales registrados.</span>
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#categorias" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
                 <strong class="text-uppercase">Categorias</strong>
                 <span class="small text-muted">Consultar categorias y cantidad de productos.</span>
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#pagos" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado basico</span>
+                <span class="badge bg-success align-self-start mb-3">Control basico</span>
                 <strong class="text-uppercase">Pagos</strong>
                 <span class="small text-muted">Consultar pagos registrados por cada venta.</span>
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#accesos" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado basico</span>
+                <span class="badge bg-success align-self-start mb-3">Control basico</span>
                 <strong class="text-uppercase">Auditoria de accesos</strong>
                 <span class="small text-muted">Ver ultimos inicios de sesion registrados.</span>
             </a>
@@ -68,16 +68,23 @@
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#devoluciones" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
                 <strong class="text-uppercase">Devoluciones</strong>
                 <span class="small text-muted">Revisar solicitudes y cambiar su estado.</span>
             </a>
         </div>
         <div class="col-md-6 col-xl-4">
             <a href="#soporte" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
-                <span class="badge bg-success align-self-start mb-3">Implementado</span>
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
                 <strong class="text-uppercase">Soporte</strong>
                 <span class="small text-muted">Atender tickets enviados por usuarios.</span>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="#solicitudes-vendedor" class="card border-0 shadow-sm p-4 h-100 text-decoration-none text-dark">
+                <span class="badge bg-success align-self-start mb-3">Modulo activo</span>
+                <strong class="text-uppercase">Solicitudes vendedor</strong>
+                <span class="small text-muted">Aprobar clientes antes de publicar productos.</span>
             </a>
         </div>
     </div>
@@ -132,7 +139,57 @@
             <strong class="display-6">{{ stats.devoluciones_pendientes }}</strong>
         </div>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <span class="text-muted">Solicitudes vendedor</span>
+            <strong class="display-6">{{ stats.solicitudes_vendedor }}</strong>
+        </div>
+    </div>
 </div>
+
+<section class="mb-4" id="solicitudes-vendedor">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h3 class="h5 fw-black text-uppercase m-0">Solicitudes de vendedor</h3>
+        <span class="text-muted small">{{ stats.solicitudes_vendedor }} pendientes</span>
+    </div>
+    <div class="table-responsive bg-white shadow-sm">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th class="text-end">Accion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for solicitud in solicitudes_vendedor %}
+                    <tr>
+                        <td>
+                            <strong>{{ solicitud.usuario.nombre|default:solicitud.usuario.email }}</strong>
+                            <div class="small text-muted">{{ solicitud.usuario.email }}</div>
+                        </td>
+                        <td>{{ solicitud.mensaje|default:"Sin mensaje" }}</td>
+                        <td><span class="badge bg-dark">{{ solicitud.estado }}</span></td>
+                        <td class="text-end">
+                            <form method="post" action="{% url 'admin_actualizar_solicitud_vendedor' solicitud.id_solicitud %}" class="d-flex justify-content-end gap-2">
+                                {% csrf_token %}
+                                <select name="estado" class="form-select form-select-sm" style="max-width: 160px;">
+                                    {% for estado in estados_solicitud_vendedor %}
+                                        <option value="{{ estado }}" {% if estado == solicitud.estado %}selected{% endif %}>{{ estado }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-outline-primary btn-sm" data-confirm="Actualizar solicitud de vendedor?">Guardar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">No hay solicitudes de vendedor.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 
 <div class="row g-4 mb-4">
     <section class="col-xl-7" id="usuarios">

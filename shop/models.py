@@ -172,6 +172,23 @@ class Devolucion(models.Model):
         db_table = 'devoluciones'
 
 
+class SolicitudVendedor(models.Model):
+    id_solicitud = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        models.CASCADE,
+        db_column='id_usuario',
+        related_name='solicitudes_vendedor',
+    )
+    mensaje = models.TextField(blank=True, null=True)
+    estado = models.CharField(max_length=30, default='pendiente')
+    fecha_solicitud = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'solicitudes_vendedor'
+
+
 class DetalleVenta(models.Model):
     id_detalle = models.AutoField(primary_key=True)
     venta = models.ForeignKey(

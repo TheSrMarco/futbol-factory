@@ -31,4 +31,9 @@ urlpatterns = [
     path('admin-panel/productos/<int:id_producto>/estado/', views.admin_toggle_producto, name='admin_toggle_producto'),
     path('admin-panel/soporte/<int:id_soporte>/estado/', views.admin_actualizar_soporte, name='admin_actualizar_soporte'),
     path('admin-panel/devoluciones/<int:id_devolucion>/estado/', views.admin_actualizar_devolucion, name='admin_actualizar_devolucion'),
+    path(
+        'admin-panel/solicitudes-vendedor/<int:id_solicitud>/estado/',
+        views.admin_actualizar_solicitud_vendedor,
+        name='admin_actualizar_solicitud_vendedor',
+    ),
 ]

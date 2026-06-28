@@ -11,15 +11,28 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .models import Carrito, Categoria, DetalleVenta, Devolucion, Pago, Producto, Sesion, Soporte, Usuario, Venta
+from .models import (
+    Carrito,
+    Categoria,
+    DetalleVenta,
+    Devolucion,
+    Pago,
+    Producto,
+    Sesion,
+    SolicitudVendedor,
+    Soporte,
+    Usuario,
+    Venta,
+)
 from .services import SESSION_USER_KEY, admin_required, get_current_usuario, login_required_view, vendedor_required
 
 
 ROLES = {'admin', 'cliente', 'vendedor'}
 LOGIN_ATTEMPT_LIMIT = settings.LOGIN_ATTEMPT_LIMIT
 LOGIN_LOCK_SECONDS = settings.LOGIN_LOCK_SECONDS
-ESTADOS_SOPORTE = {'abierto', 'en_revision', 'resuelto'}
-ESTADOS_DEVOLUCION = {'solicitada', 'en_revision', 'aprobada', 'rechazada'}
+ESTADOS_SOPORTE = ('abierto', 'en_revision', 'resuelto')
+ESTADOS_DEVOLUCION = ('solicitada', 'en_revision', 'aprobada', 'rechazada')
+ESTADOS_SOLICITUD_VENDEDOR = ('pendiente', 'en_revision', 'aprobada', 'rechazada')
 
 
 def _safe_next_url(request):
@@ -158,7 +171,11 @@ def logout_view(request):
 
 @login_required_view
 def perfil(request):
-    return render(request, 'shop/perfil.html')
+    solicitud_vendedor = None
+    usuario = get_current_usuario(request)
+    if usuario.rol == 'cliente':
+        solicitud_vendedor = SolicitudVendedor.objects.filter(usuario=usuario).first()
+    return render(request, 'shop/perfil.html', {'solicitud_vendedor': solicitud_vendedor})
 
 
 @login_required_view
@@ -364,16 +381,41 @@ def quiero_vender(request):
     if usuario.rol == 'vendedor':
         messages.info(request, 'Ya eres vendedor.')
         return redirect('perfil')
-    return render(request, 'shop/vender_registro.html')
+    solicitud = SolicitudVendedor.objects.filter(usuario=usuario).first()
+    return render(request, 'shop/vender_registro.html', {'solicitud': solicitud})
 
 
 @login_required_view
 def convertir_vendedor(request):
-    if request.method == 'POST':
-        usuario = get_current_usuario(request)
-        usuario.rol = 'vendedor'
-        usuario.save(update_fields=['rol'])
-        messages.success(request, 'Ahora tienes una cuenta de vendedor.')
+    if request.method != 'POST':
+        return redirect('quiero_vender')
+
+    usuario = get_current_usuario(request)
+    if usuario.rol in {'admin', 'vendedor'}:
+        messages.info(request, 'Tu cuenta ya tiene permisos suficientes.')
+        return redirect('perfil')
+
+    mensaje = (request.POST.get('mensaje') or '').strip()
+    solicitud, created = SolicitudVendedor.objects.get_or_create(
+        usuario=usuario,
+        defaults={
+            'mensaje': mensaje,
+            'estado': 'pendiente',
+            'fecha_solicitud': timezone.now(),
+        },
+    )
+    if not created and solicitud.estado == 'rechazada':
+        solicitud.mensaje = mensaje
+        solicitud.estado = 'pendiente'
+        solicitud.fecha_solicitud = timezone.now()
+        solicitud.save(update_fields=['mensaje', 'estado', 'fecha_solicitud'])
+        messages.success(request, 'Solicitud enviada nuevamente para revision.')
+        return redirect('perfil')
+    if not created:
+        messages.info(request, 'Ya tienes una solicitud de vendedor en revision.')
+        return redirect('perfil')
+
+    messages.success(request, 'Solicitud enviada. Un administrador revisara tu cuenta.')
     return redirect('perfil')
 
 
@@ -470,6 +512,7 @@ def admin_dashboard(request):
     sesiones = Sesion.objects.select_related('usuario').order_by('-fecha_login', '-id_sesion')
     tickets = Soporte.objects.select_related('usuario').order_by('-fecha_creacion', '-id_soporte')
     devoluciones = Devolucion.objects.select_related('venta', 'usuario').order_by('-fecha_solicitud', '-id_devolucion')
+    solicitudes_vendedor = SolicitudVendedor.objects.select_related('usuario').order_by('-fecha_solicitud', '-id_solicitud')
     total_ventas = ventas.aggregate(total=Sum('total_pago'))['total'] or Decimal('0.00')
 
     stats = {
@@ -484,6 +527,7 @@ def admin_dashboard(request):
         'sesiones': sesiones.count(),
         'tickets_abiertos': tickets.exclude(estado='resuelto').count(),
         'devoluciones_pendientes': devoluciones.exclude(estado__in=['aprobada', 'rechazada']).count(),
+        'solicitudes_vendedor': solicitudes_vendedor.exclude(estado__in=['aprobada', 'rechazada']).count(),
         'total_ventas': total_ventas,
     }
 
@@ -499,10 +543,12 @@ def admin_dashboard(request):
             'sesiones': sesiones[:10],
             'tickets': tickets[:10],
             'devoluciones': devoluciones[:10],
+            'solicitudes_vendedor': solicitudes_vendedor[:10],
             'stats': stats,
             'roles': sorted(ROLES),
-            'estados_soporte': sorted(ESTADOS_SOPORTE),
-            'estados_devolucion': sorted(ESTADOS_DEVOLUCION),
+            'estados_soporte': ESTADOS_SOPORTE,
+            'estados_devolucion': ESTADOS_DEVOLUCION,
+            'estados_solicitud_vendedor': ESTADOS_SOLICITUD_VENDEDOR,
         },
     )
 
@@ -572,4 +618,26 @@ def admin_actualizar_devolucion(request, id_devolucion):
     devolucion.estado = estado
     devolucion.save(update_fields=['estado'])
     messages.success(request, f'Devolucion #{devolucion.id_devolucion} actualizada.')
+    return redirect('admin_dashboard')
+
+
+@admin_required
+def admin_actualizar_solicitud_vendedor(request, id_solicitud):
+    if request.method != 'POST':
+        return redirect('admin_dashboard')
+
+    solicitud = get_object_or_404(SolicitudVendedor.objects.select_related('usuario'), pk=id_solicitud)
+    estado = request.POST.get('estado')
+    if estado not in ESTADOS_SOLICITUD_VENDEDOR:
+        messages.error(request, 'Estado de solicitud invalido.')
+        return redirect('admin_dashboard')
+
+    solicitud.estado = estado
+    solicitud.save(update_fields=['estado'])
+    if estado == 'aprobada':
+        solicitud.usuario.rol = 'vendedor'
+        solicitud.usuario.save(update_fields=['rol'])
+        messages.success(request, f'{solicitud.usuario.email} ahora es vendedor.')
+    else:
+        messages.success(request, f'Solicitud #{solicitud.id_solicitud} actualizada.')
     return redirect('admin_dashboard')

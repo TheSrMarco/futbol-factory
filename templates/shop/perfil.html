@@ -12,7 +12,11 @@
     {% elif current_usuario.rol == 'vendedor' %}
         <a href="{% url 'dashboard' %}" class="btn btn-primary">Ir al dashboard</a>
     {% else %}
-        <a href="{% url 'quiero_vender' %}" class="btn btn-primary">Quiero vender</a>
+        {% if solicitud_vendedor and solicitud_vendedor.estado != 'rechazada' %}
+            <a href="{% url 'quiero_vender' %}" class="btn btn-outline-primary">Solicitud vendedor: {{ solicitud_vendedor.estado }}</a>
+        {% else %}
+            <a href="{% url 'quiero_vender' %}" class="btn btn-primary">Solicitar vendedor</a>
+        {% endif %}
     {% endif %}
     <a href="{% url 'soporte' %}" class="btn btn-outline-primary ms-sm-2 mt-2 mt-sm-0">Soporte</a>
 </div>

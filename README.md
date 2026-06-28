@@ -147,7 +147,7 @@ El prototipo maneja tres roles principales:
 - `admin`: revisa usuarios, cambia roles, consulta categorias, productos,
   ventas, pagos basicos, devoluciones, soporte y auditoria de accesos.
 
-Usuarios demo:
+Credenciales de prueba:
 
 ```text
 Admin:    yoshi@gmail.com      / root

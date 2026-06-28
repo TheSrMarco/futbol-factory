@@ -21,8 +21,12 @@
     scroll-behavior: smooth;
 }
 
-html, body {
-    height: 100%;
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
 }
 
 body {
@@ -41,8 +45,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 main {
-    flex: 1;
+    flex: 1 0 auto;
     animation: fadeIn 0.5s ease-in;
+}
+
+.site-main {
+    min-height: 75vh;
+    padding-bottom: 3rem;
 }
 
 @keyframes fadeIn {
@@ -236,14 +245,16 @@ main {
     height: 280px;
 }
 
-.card-sport img {
+.card-sport > img.card-img-top {
     transition: var(--transition);
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: 260px;
+    object-fit: contain;
+    background: #fff;
+    flex: 0 0 auto;
 }
 
-.card-sport:hover img {
+.card-sport:hover > img.card-img-top {
     transform: scale(1.12) rotate(2deg);
 }
 
@@ -414,6 +425,9 @@ footer {
     border-top: 4px solid var(--sport-blue);
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.15);
     margin-top: auto;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 
 footer h4 {
@@ -654,6 +668,10 @@ footer a:hover {
         height: 220px;
     }
 
+    .card-sport > img.card-img-top {
+        height: 220px;
+    }
+
     .price-tag {
         font-size: 1.2rem;
     }
@@ -700,6 +718,10 @@ footer a:hover {
 
     .card-sport {
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-sport > img.card-img-top {
+        height: 190px;
     }
 
     .carousel-item img {

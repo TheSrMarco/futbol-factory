@@ -151,6 +151,7 @@ Credenciales de prueba:
 
 ```text
 Admin:    yoshi@gmail.com      / root
+Admin 2:  admin@ffactory.com  / root
 Cliente:  cliente@ffactory.com / root
 Vendedor: vendedor@ffactory.com / root
 ```
@@ -180,6 +181,8 @@ Vendedor: vendedor@ffactory.com / root
 
 - Se agrego `manage.py` y el proyecto `futbol_factory/`.
 - Se agrego el app Django `shop/`.
+- El directorio `app/` se conserva como referencia del prototipo Flask original;
+  la aplicacion activa para ejecucion y entrega es Django.
 - Los modelos Django apuntan a las tablas existentes (`usuarios`,
   `productos`, `carrito`, `ventas`, etc.) con `managed = False`.
 - Se conserva la verificacion de contrasenas existentes con Werkzeug para no

@@ -233,6 +233,31 @@ main {
 }
 
 /* ========================================
+   PERFIL DE USUARIO
+   ======================================== */
+
+.profile-card {
+    max-width: 960px;
+    margin-inline: auto;
+}
+
+.profile-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.profile-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    width: 100%;
+}
+
+/* ========================================
    TARJETAS DE PRODUCTOS
    ======================================== */
 
@@ -733,6 +758,14 @@ footer a:hover {
 
     .card-sport {
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .profile-card {
+        padding: 1.25rem !important;
+    }
+
+    .profile-actions {
+        grid-template-columns: 1fr;
     }
 
     .card-sport > img.card-img-top {

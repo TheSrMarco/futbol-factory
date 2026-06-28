@@ -3,21 +3,24 @@
 {% block title %}Perfil{% endblock %}
 
 {% block content %}
-<div class="card border-0 shadow-sm p-4">
+<div class="card border-0 shadow-sm p-4 profile-card">
     <h2 class="fw-black text-uppercase">{{ current_usuario.nombre }}</h2>
     <p class="mb-1"><strong>Email:</strong> {{ current_usuario.email }}</p>
-    <p class="mb-4"><strong>Rol:</strong> {{ current_usuario.rol }}</p>
-    {% if current_usuario.rol == 'admin' %}
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Ir al panel admin</a>
-    {% elif current_usuario.rol == 'vendedor' %}
-        <a href="{% url 'dashboard' %}" class="btn btn-primary">Ir al dashboard</a>
-    {% else %}
-        {% if solicitud_vendedor and solicitud_vendedor.estado != 'rechazada' %}
-            <a href="{% url 'quiero_vender' %}" class="btn btn-outline-primary">Solicitud vendedor: {{ solicitud_vendedor.estado }}</a>
+    <p class="mb-0"><strong>Rol:</strong> {{ current_usuario.rol }}</p>
+
+    <div class="profile-actions">
+        {% if current_usuario.rol == 'admin' %}
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary"><i class="bi bi-speedometer2"></i> Ir al panel admin</a>
+        {% elif current_usuario.rol == 'vendedor' %}
+            <a href="{% url 'dashboard' %}" class="btn btn-primary"><i class="bi bi-grid-1x2-fill"></i> Ir al dashboard</a>
         {% else %}
-            <a href="{% url 'quiero_vender' %}" class="btn btn-primary">Solicitar vendedor</a>
+            {% if solicitud_vendedor and solicitud_vendedor.estado != 'rechazada' %}
+                <a href="{% url 'quiero_vender' %}" class="btn btn-outline-primary"><i class="bi bi-hourglass-split"></i> Solicitud vendedor: {{ solicitud_vendedor.estado }}</a>
+            {% else %}
+                <a href="{% url 'quiero_vender' %}" class="btn btn-primary"><i class="bi bi-shop"></i> Solicitar vendedor</a>
+            {% endif %}
         {% endif %}
-    {% endif %}
-    <a href="{% url 'soporte' %}" class="btn btn-outline-primary ms-sm-2 mt-2 mt-sm-0">Soporte</a>
+        <a href="{% url 'soporte' %}" class="btn btn-outline-primary"><i class="bi bi-life-preserver"></i> Soporte</a>
+    </div>
 </div>
 {% endblock %}

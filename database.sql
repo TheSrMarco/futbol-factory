@@ -551,6 +551,7 @@ COPY public.usuarios (id_usuario, email, password, rol, nombre) FROM stdin;
 14	yoshi@gmail.com	pbkdf2:sha256:1000000$2RQAwVAee0egdAVP$00d171ea83e6e10c889c28cbcab2c508a4d1080b85bb6dbbfd53ddd1a1cf18e3	admin	Yoshiro
 15	cliente@ffactory.com	pbkdf2:sha256:1000000$hMfgzs82Qh2QQf10$a315041befbc9c47aec8e34d2d547640cbffd1c05afe0c112ba20303c34c3ce7	cliente	Cliente Prueba
 16	vendedor@ffactory.com	pbkdf2:sha256:1000000$m4FfAb4SuUSkWs8t$228f128bb27940adb1f45eb6dafae370988e7d3a0dbc0157cce0756494bc20a2	vendedor	Vendedor Prueba
+17	admin@ffactory.com	pbkdf2:sha256:1000000$2RQAwVAee0egdAVP$00d171ea83e6e10c889c28cbcab2c508a4d1080b85bb6dbbfd53ddd1a1cf18e3	admin	Admin Prueba
 \.
 
 
@@ -646,7 +647,7 @@ SELECT pg_catalog.setval('public.sesiones_id_sesion_seq', 1, false);
 -- Name: usuarios_id_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.usuarios_id_usuario_seq', 16, true);
+SELECT pg_catalog.setval('public.usuarios_id_usuario_seq', 17, true);
 
 
 --

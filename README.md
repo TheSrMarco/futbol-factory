@@ -38,6 +38,15 @@ La version actual conserva:
 Quedan como pendientes productivos los controles avanzados documentados para una
 version final: pasarela de pago tokenizada, CAPTCHA, 2FA y despliegue HTTPS.
 
+## Documentacion S-SDLC
+
+Las entregas academicas del proyecto se encuentran en [`docs/`](docs/):
+
+- Etapa 1: planeacion.
+- Etapa 2: analisis.
+- Etapa 3: diseno.
+- Etapa 4: desarrollo e implementacion.
+
 ## Como se ejecuta
 
 No abras los archivos HTML con doble clic. El proyecto es una aplicacion web de

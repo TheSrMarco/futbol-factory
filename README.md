@@ -1,12 +1,8 @@
 # Futbol Factory
 
-Aplicacion web para compra y venta de productos deportivos. La documentacion del
-proyecto plantea una solucion con Django, PostgreSQL y Bootstrap; por eso esta
-reestructuracion deja a Django como tecnologia principal de ejecucion.
-
-> Nota historica: el prototipo anterior estaba hecho con Flask. Ese codigo se
-> conserva temporalmente en `app/` como referencia, pero la entrada correcta del
-> proyecto ahora es Django mediante `manage.py`.
+Aplicacion web Django para compra y venta de productos deportivos. El proyecto
+usa PostgreSQL, Bootstrap y plantillas Django para centralizar catalogo,
+carrito, compras, perfiles, panel de vendedor y administracion.
 
 ## Tecnologias
 
@@ -19,12 +15,12 @@ reestructuracion deja a Django como tecnologia principal de ejecucion.
 
 ## Estado actual del proyecto
 
-El codigo inicial encontrado en este repositorio estaba implementado con Flask,
-aunque la documentacion academica describia Django, PostgreSQL y Bootstrap. Para
-mantener coherencia con la documentacion S-SDLC, el proyecto fue reestructurado
-a Django.
+El repositorio se encuentra estructurado como una aplicacion Django. La entrada
+principal es `manage.py`; el paquete `futbol_factory/` contiene la configuracion
+general y la app `shop/` concentra modelos, vistas, rutas, servicios,
+plantillas y controles de acceso.
 
-La version actual conserva:
+La version actual incluye:
 
 - PostgreSQL como base de datos.
 - Bootstrap para la interfaz visual.
@@ -118,7 +114,7 @@ python manage.py check
 python manage.py runserver
 ```
 
-Tambien puedes usar el wrapper de compatibilidad:
+Tambien puedes usar el wrapper opcional:
 
 ```powershell
 python script.py
@@ -186,47 +182,42 @@ Vendedor: vendedor@ffactory.com / root
 - `SECURE_SSL_REDIRECT`: redireccion forzada a HTTPS para despliegue.
 - `SECURE_HSTS_SECONDS`: tiempo HSTS cuando el sitio ya corre sobre HTTPS.
 
-## Decisiones de migracion
+## Arquitectura Django
 
-- Se agrego `manage.py` y el proyecto `futbol_factory/`.
-- Se agrego el app Django `shop/`.
-- El directorio `app/` se conserva como referencia del prototipo Flask original;
-  la aplicacion activa para ejecucion y entrega es Django.
+- `manage.py` ejecuta los comandos principales de Django.
+- `futbol_factory/` contiene configuracion, URLs generales, ASGI y WSGI.
+- `shop/` concentra reglas de negocio, modelos, vistas, servicios, rutas y
+  context processors.
+- `templates/shop/` contiene las pantallas renderizadas por Django.
+- `static/` contiene estilos y recursos visuales.
+- `script.py` es un wrapper opcional para arrancar el servidor local.
 - Los modelos Django apuntan a las tablas existentes (`usuarios`,
   `productos`, `carrito`, `ventas`, etc.) con `managed = False`.
-- Se conserva la verificacion de contrasenas existentes con Werkzeug para no
-  perder compatibilidad con los hashes actuales de la base.
-- Los formularios Django usan `{% csrf_token %}` y el middleware CSRF.
-- El cierre de compra ahora usa `transaction.atomic()` y valida stock/precio
-  vigente antes de crear la venta.
+- La verificacion de contrasenas usa Werkzeug para mantener compatibilidad con
+  los hashes actuales de la base de datos.
+- Los formularios usan `{% csrf_token %}` y el middleware CSRF de Django.
+- El cierre de compra usa `transaction.atomic()` y valida stock/precio vigente
+  antes de crear la venta.
 - Los mensajes de Django se mapean a alertas Bootstrap y las acciones sensibles
   piden confirmacion en el navegador.
 
-## Buenas practicas pendientes
+## Pendientes productivos
 
-- Mover o eliminar el prototipo Flask de `app/` cuando Django quede aprobado.
-- Eliminar HTML duplicados de la raiz antes de empaquetar.
-- Limpiar `__pycache__` del entregable.
-- Sustituir datos personales del `database.sql` por datos de prueba anonimos.
+- Integrar pasarela de pago real con tokenizacion.
+- Agregar CAPTCHA y 2FA si el sistema se publica fuera del entorno academico.
+- Desplegar con HTTPS, HSTS y cookies seguras.
+- Agregar pruebas automatizadas para login, catalogo, carrito, compra y roles.
+- Sustituir datos personales del `database.sql` por datos de prueba anonimos si
+  el repositorio se mantiene publico.
 
 ## Flujo Git recomendado
 
-Trabaja los cambios en una rama separada:
-
-```powershell
-git switch -c refactor/migracion-django
-```
-
-Cuando el proyecto arranque y pase la verificacion:
+Antes de publicar cambios, verifica el proyecto y crea un commit claro:
 
 ```powershell
 python manage.py check
+git status
 git add .
-git commit -m "refactor: migrar prototipo a django"
-```
-
-Para publicar la rama:
-
-```powershell
-git push -u origin refactor/migracion-django
+git commit -m "chore: describir cambio"
+git push
 ```

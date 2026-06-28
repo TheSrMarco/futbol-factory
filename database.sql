@@ -437,10 +437,10 @@ COPY public.carrito (id_carrito, id_usuario, id_producto, cantidad) FROM stdin;
 --
 
 COPY public.categorias (id_categoria, nombre) FROM stdin;
-1	Laptops
-2	Bolsos
-3	Mujer
-4	Hombre
+1	Calzado
+2	Bolsos deportivos
+3	Balones
+4	Ropa deportiva
 5	Accesorios
 \.
 
@@ -500,21 +500,21 @@ COPY public.pago (id_pago, id_venta, metodo_pago, estado_pago, fecha_pago) FROM 
 --
 
 COPY public.productos (id_producto, nombre, descripcion, precio, stock, imagen_url, id_categoria, id_vendedor, activo) FROM stdin;
-5	Tennis Nike Premier	sdasadsa	550.00	1	https://m.media-amazon.com/images/I/71oG884tDJL._AC_SX575_.jpg	1	5	f
-6	Tennis Pirma 	sdsadasdasdddddddddddddddd	700.00	1	https://m.media-amazon.com/images/I/61Vhw88vVGL._AC_SX575_.jpg	1	5	f
-4	gorra	None	400.00	6	https://m.media-amazon.com/images/I/51DZ5PAO7pL._AC_SX679_.jpg	1	5	f
-7	Tennis Nike	Tennis para correr	700.00	1		1	7	f
-3	Laptop Lenovo IdeaPad 1	Laptop con procesador Intel Core i7, 8GB RAM y 512GB SSD	850.00	15	https://mi-tienda.com/imagenes/lenovo-ideapad3.jpg	1	\N	f
-2	Laptop Lenovo IdeaPad 3	Laptop con procesador Intel Core i5, 8GB RAM y 512GB SSD	750.00	15	https://unsplash.com/es/fotos/dos-hombres-con-traje-paseando-juntos-al-aire-libre-aBm0Zvp1S2c	1	\N	f
-10	Tennis Nike Premier	dasdasda	700.00	1	https://m.media-amazon.com/images/I/711EGIS6SZL._AC_SX575_.jpg	4	7	f
-8	Tennis Nike	tennis futbol	700.00	1	https://m.media-amazon.com/images/I/61aVQ6oYU-L._AC_SY575_.jpg	1	7	f
-9	Tennis Nike Premier	tennnis para hombre numero 7 	700.00	1	https://m.media-amazon.com/images/I/711EGIS6SZL._AC_SX575_.jpg	1	7	f
-11	Tennis Nike Premier	jnjjjjj	700.00	1	https://m.media-amazon.com/images/I/711EGIS6SZL._AC_SX575_.jpg	4	7	f
-12	Teenis	Tennis nike originales\r\n	7000.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	3	2	t
-13	Teenis	dsdfsfsfs	700.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	4	9	f
-14	Teenis	safsdfs	5.00	1		3	9	f
-15	tenis negros nike	tenis	500.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	2	13	t
-16	bolso	jjhjkhjkhjkh	500.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	2	13	f
+5	Tenis Nike Premier	Calzado deportivo para cancha.	550.00	1	https://m.media-amazon.com/images/I/71oG884tDJL._AC_SX575_.jpg	1	5	f
+6	Tenis Pirma Azul	Tenis de futbol para entrenamiento.	700.00	1	https://m.media-amazon.com/images/I/61Vhw88vVGL._AC_SX575_.jpg	1	5	t
+4	Gorra deportiva negra	Gorra ligera para uso deportivo.	400.00	6	https://m.media-amazon.com/images/I/51DZ5PAO7pL._AC_SX679_.jpg	5	5	f
+7	Tenis Nike Mercurial	Tenis deportivo Nike con suela para cancha.	700.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	1	7	t
+3	Jersey deportivo local	Playera deportiva para entrenamiento.	850.00	15	https://mi-tienda.com/imagenes/lenovo-ideapad3.jpg	4	\N	f
+2	Balon de futbol profesional	Balon resistente para entrenamiento y partidos.	750.00	15	https://unsplash.com/es/fotos/dos-hombres-con-traje-paseando-juntos-al-aire-libre-aBm0Zvp1S2c	3	\N	f
+10	Tenis Nike Premier Negro	Calzado deportivo de alto rendimiento.	700.00	1	https://m.media-amazon.com/images/I/711EGIS6SZL._AC_SX575_.jpg	1	7	f
+8	Tenis Nike Futbol	Calzado para futbol recreativo.	700.00	1	https://m.media-amazon.com/images/I/61aVQ6oYU-L._AC_SY575_.jpg	1	7	f
+9	Tenis Nike Premier Hombre	Tenis deportivos para entrenamiento.	700.00	1	https://m.media-amazon.com/images/I/711EGIS6SZL._AC_SX575_.jpg	1	7	f
+11	Tenis Nike Premier Blanco	Tenis deportivos para cancha.	700.00	1	https://m.media-amazon.com/images/I/711EGIS6SZL._AC_SX575_.jpg	1	7	f
+12	Tenis Nike Premier	Tenis Nike originales para futbol.	700.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	1	2	t
+13	Tenis Nike Entrenamiento	Tenis para entrenamiento diario.	700.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	1	9	f
+14	Tenis Nike Basico	Tenis deportivos basicos.	500.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	1	9	f
+15	Tenis Negros Nike	Tenis negros Nike para entrenamiento.	500.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	1	13	t
+16	Bolso Deportivo	Bolso deportivo para equipamiento.	500.00	1	https://m.media-amazon.com/images/I/71jAr2M6RwL._AC_SY575_.jpg	2	13	f
 \.
 
 

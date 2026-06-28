@@ -54,6 +54,10 @@ main {
     padding-bottom: 3rem;
 }
 
+.site-main [id] {
+    scroll-margin-top: 112px;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
